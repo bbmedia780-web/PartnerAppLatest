@@ -47,7 +47,7 @@ class ServiceListCard extends StatelessWidget {
                           child: Text(
                             service.serviceType,
                             style: AppTextStyles.subHeading.copyWith(
-                              fontSize: 14,
+                              fontSize: 15,
                               fontWeight: FontWeight.w600,
                               color: blackColor,
                             ),
@@ -74,12 +74,33 @@ class ServiceListCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Text(
-                      service.serviceName,
-                      style: AppTextStyles.subHeading.copyWith(
-                        fontSize: 12,
-                        color:  greyLight,
-                      ),
+                    3.height,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            service.serviceName,
+                            style: AppTextStyles.subHeading.copyWith(
+                              fontSize: 12,
+                              color:  greyLight,
+                            ),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Icon(Icons.currency_rupee_outlined,color: appColor,size: 16,weight: 10,),
+                            Text(
+                              service.price,
+                              style: AppTextStyles.subHeading.copyWith(
+                                fontSize: 14,
+                                color:  appColor,
+                                fontWeight: FontWeight.bold
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                     4.height,
                     Text(

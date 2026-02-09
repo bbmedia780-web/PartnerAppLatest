@@ -71,9 +71,9 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                   // Text Layer on Top
                   Positioned(
-                    left: 20,
+                    left: 16,
                     bottom: 20,
-                    right: 20,
+                    right: 16,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -143,7 +143,7 @@ class _SignInScreenState extends State<SignInScreen> {
           return SizedBox(
             height: 100,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
               child: Column(
                 children: [
                   CustomButton(

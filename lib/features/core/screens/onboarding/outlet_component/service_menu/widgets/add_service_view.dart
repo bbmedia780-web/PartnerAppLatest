@@ -1,328 +1,329 @@
 import 'dart:io';
 import '../../../../../../../utils/library_utils.dart';
 
-class AddServiceDialog extends StatelessWidget {
-  final TextEditingController serviceName = TextEditingController();
+class AddServiceDialog extends StatefulWidget {
+  final ServiceModel? data;
+
+  const AddServiceDialog({super.key, this.data});
+
+  @override
+  State<AddServiceDialog> createState() => _AddServiceDialogState();
+}
+
+class _AddServiceDialogState extends State<AddServiceDialog> {
+  final TextEditingController serviceNameController = TextEditingController();
+  final TextEditingController priceController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
+
   final ServiceMenuController controller = Get.find<ServiceMenuController>();
-  final RxBool isValid = false.obs;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  AddServiceDialog({super.key});
+  @override
+  void initState() {
+    super.initState();
+
+    /// 🔹 EDIT MODE → PREFILL DATA
+    if (widget.data != null) {
+      final service = widget.data!;
+
+      serviceNameController.text = service.name;
+      priceController.text = service.price;
+      descriptionController.text = service.description ?? "";
+
+      controller.isServiceStatus.value =
+          service.status.toLowerCase() == "active";
+
+      controller.selectedCategories.value =
+          service.category ?? controller.selectedCategories.value;
+
+      /// clear & load images
+      controller.selectedImages.clear();
+      for (final img in service.images) {
+        controller.addExistingImage(img); // 👈 controller method
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    serviceNameController.dispose();
+    priceController.dispose();
+    descriptionController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final isEdit = widget.data != null;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 50,
-              height: 5,
-              decoration: BoxDecoration(
-                color: kColorGray.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(10),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Container(
+                width: 50,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: kColorGray.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
             ),
-          ),
 
-          16.height,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox.shrink(),
-              Text(
-                "Add New Service",
-                style: AppTextStyles.heading2.copyWith(fontSize: 16),
-              ),
-              InkWell(
-                  onTap: (){
-                    Get.back();
-                  },
-                  child: Image.asset(AppImages.closeIcon,height: 25,width: 25,))
-            ],
-          ),
+            16.height,
 
-          20.height,
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              "Category",
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: appBlack),
-            ),
-          ),
-          DropdownButtonFormField<String>(
-            value: controller.selectedCategories.value,
-            icon: const Icon(Icons.keyboard_arrow_down_rounded),
-            decoration: InputDecoration(
-                hintText: "Choose your outlet type",
-                hintStyle: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w400, color: kColorGray),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-                filled: false,
-                fillColor: whiteColor,
-                border: customFieldBorder,
-                enabledBorder: customFieldBorder,
-                errorBorder: customFieldBorder,
-                focusedBorder: customFieldBorder
-            ),
-            items: controller.lstCategories
-                .map(
-                  (item) => DropdownMenuItem(
-                value: item,
-                child: Text(item, style: const TextStyle(fontSize: 15)),
-              ),
-            )
-                .toList(),
-            onChanged: (value) {
-              controller.selectedCategories.value = value??"";
-            },
-          ),
-          12.height,
-          Form(
-            key: formKey,
-            child: Column(
-              children: [
-                _buildInput("Service Name", serviceName, Icons.spa),
-                8.height,
-                CustomTextField(
-                  controller: descriptionController,
-                  hintText: "Description",
-                  labelName: 'Description (optional)',
-                ),
-              ],
-            ),
-          ),
-          12.height,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Service status (Active/Inactive)',
-                style: AppTextStyles.subHeading.copyWith(fontSize: 14),
-              ),
-              Obx(() {
-                return Transform.scale(
-                  scale: 0.7,
-                  child: Switch(
-                    activeColor: appColor,
-                    value: controller.isServiceStatus.value,
-                    onChanged: (value) {
-                      controller.isServiceStatus.value =
-                      !controller.isServiceStatus.value;
-                    },
-                  ),
-                );
-              }),
-            ],
-          ),
-          12.height,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Upload Images (optional)',
-                style: AppTextStyles.subHeading.copyWith(fontSize: 14),
-              ),
-              Obx(() {
-                if (controller.selectedImages.isNotEmpty) {
-                  return GestureDetector(
-                    onTap: () {
-                      controller.clearAllImages();
-                    },
-                    child: Text(
-                      'Clear All',
-                      style: AppTextStyles.regular.copyWith(
-                        fontSize: 12,
-                        color: errorColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  );
-                }
-                return SizedBox.shrink();
-              }),
-            ],
-          ),
-          12.height,
-          Obx(() {
-            return Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                // Display selected images
-                ...controller.selectedImages.asMap().entries.map((entry) {
-                  int index = entry.key;
-                  File imageFile = entry.value;
-                  return Stack(
-                    children: [
-                      Container(
-                        height: 100,
-                        width: 100,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: borderGreyColor),
-                          image: DecorationImage(
-                            image: FileImage(imageFile),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 0,
-                        right: 0,
-                        child: GestureDetector(
-                          onTap: () {
-                            controller.removeServiceImage(index);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: errorColor,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: whiteColor, width: 2),
-                            ),
-                            child: Icon(
-                              Icons.close,
-                              color: whiteColor,
-                              size: 16,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                }),
-                // Add image button
-                GestureDetector(
-                  onTap: () {
-                    // Show dialog to choose single or multiple
-                    Get.dialog(
-                      AlertDialog(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        title: Text(
-                          "Add Images",
-                          style: AppTextStyles.heading2.copyWith(fontSize: 16),
-                        ),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ListTile(
-                              leading: Icon(Icons.add_photo_alternate, color: appColor),
-                              title: Text("Add Single Image"),
-                              onTap: () async {
-                                Get.back();
-                                await controller.pickSingleServiceImage();
-                              },
-                            ),
-                            ListTile(
-                              leading: Icon(Icons.photo_library, color: appColor),
-                              title: Text("Add Multiple Images"),
-                              onTap: () async {
-                                Get.back();
-                                await controller.pickMultipleServiceImages();
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    height: 100,
-                    width: 100,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: borderGreyColor, style: BorderStyle.solid),
-                      color: kColorGray.withValues(alpha: 0.2),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.add_photo_alternate,
-                          color: kColorGray,
-                          size: 30,
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Add',
-                          style: AppTextStyles.regular.copyWith(
-                            fontSize: 10,
-                            color: kColorGray,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            );
-          }),
-          25.height,
-          SafeArea(
-            child: Row(
+            /// 🔹 TITLE
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: CustomButton(
-                    title: "Save",
-                    onTap: () {
-                      if (formKey.currentState!.validate()) {
-                        Get.back(result: {"name": serviceName.text.trim()});
-                      }
-                    },
-                    isDisable: false,
-                  ),
+                const SizedBox(),
+                Text(
+                  isEdit ? "Edit Service" : "Add New Service",
+                  style: AppTextStyles.heading2.copyWith(fontSize: 16),
                 ),
-                10.width,
-                Expanded(
-                  child: CustomButton(
-                    bgColor: borderGreyColor,
-                    title: "Cancel",
-                    onTap: (){
-                      Get.back();
+                InkWell(
+                  onTap: Get.back,
+                  child: Image.asset(AppImages.closeIcon, height: 25),
+                ),
+              ],
+            ),
+
+            20.height,
+
+            /// 🔹 CATEGORY
+            Text(
+              "Category",
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: appBlack,
+              ),
+            ),
+            8.height,
+
+            Obx(() {
+              return DropdownButtonFormField<String>(
+                value: controller.selectedCategories.value.isEmpty
+                    ? null
+                    : controller.selectedCategories.value,
+                decoration: InputDecoration(
+                  hintText: "Choose category",
+                  border: customFieldBorder,
+                  enabledBorder: customFieldBorder,
+                ),
+                items: controller.lstCategories
+                    .map(
+                      (item) => DropdownMenuItem(
+                    value: item,
+                    child: Text(item),
+                  ),
+                )
+                    .toList(),
+                onChanged: (value) {
+                  controller.selectedCategories.value = value ?? "";
+                },
+              );
+            }),
+
+            12.height,
+
+            /// 🔹 FORM
+            Form(
+              key: formKey,
+              child: Column(
+                children: [
+                  _buildInput("Service Name", serviceNameController, Icons.spa),
+                  8.height,
+                  _buildInput(
+                      "Price", priceController, Icons.currency_rupee),
+                  8.height,
+                  CustomTextField(
+                    controller: descriptionController,
+                    labelName: "Description (optional)",
+                    hintText: "Description",
+                  ),
+                ],
+              ),
+            ),
+
+            12.height,
+
+            /// 🔹 STATUS
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Service Status',
+                  style: AppTextStyles.subHeading.copyWith(fontSize: 14),
+                ),
+                Obx(
+                      () => Switch(
+                    value: controller.isServiceStatus.value,
+                    activeColor: appColor,
+                    onChanged: (val) {
+                      controller.isServiceStatus.value = val;
                     },
-                    isOutLineBorder: false,
-                    titleColor: kColorGray,
-                    isDisable: false,
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+
+            12.height,
+
+            /// 🔹 IMAGES
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Upload Images (optional)',
+                  style: AppTextStyles.subHeading.copyWith(fontSize: 14),
+                ),
+                Obx(() {
+                  return controller.selectedImages.isNotEmpty
+                      ? GestureDetector(
+                    onTap: controller.clearAllImages,
+                    child: Text(
+                      'Clear All',
+                      style: TextStyle(
+                          color: errorColor,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  )
+                      : const SizedBox();
+                }),
+              ],
+            ),
+
+            12.height,
+
+            _imageSection(),
+
+            24.height,
+
+            /// 🔹 ACTION BUTTONS
+            SafeArea(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CustomButton(
+                      title: "Save",
+                      onTap: _onSave,
+                      isDisable: false,
+                    ),
+                  ),
+                  10.width,
+                  Expanded(
+                    child: CustomButton(
+                      title: "Cancel",
+                      bgColor: borderGreyColor,
+                      titleColor: kColorGray,
+                      onTap: Get.back,
+                      isDisable: false,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
+  /// 🔹 IMAGE UI
+  Widget _imageSection() {
+    return Obx(() {
+      return Wrap(
+        spacing: 12,
+        runSpacing: 12,
+        children: [
+          ...controller.selectedImages.asMap().entries.map((entry) {
+            final index = entry.key;
+            final image = entry.value;
+
+            return Stack(
+              children: [
+                Container(
+                  height: 100,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: borderGreyColor),
+                    image: DecorationImage(
+                      image: FileImage(image),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: GestureDetector(
+                    onTap: () =>
+                        controller.removeServiceImage(index),
+                    child: const CircleAvatar(
+                      radius: 12,
+                      backgroundColor: Colors.red,
+                      child: Icon(Icons.close,
+                          size: 14, color: Colors.white),
+                    ),
+                  ),
+                )
+              ],
+            );
+          }),
+
+          /// ADD IMAGE
+          GestureDetector(
+            onTap: controller.showImagePickerDialog,
+            child: Container(
+              height: 100,
+              width: 100,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: borderGreyColor),
+              ),
+              child: const Icon(Icons.add_photo_alternate),
+            ),
+          ),
+        ],
+      );
+    });
+  }
 
   Widget _buildInput(
-      String label,
-      TextEditingController controller,
-      IconData icon,
-      ) {
-    controller.addListener(() => isValid.refresh());
-
+      String label, TextEditingController controller, IconData icon) {
     return CustomTextField(
       controller: controller,
+      labelName: label,
       hintText: label,
       prefixIcon: Icon(icon, color: Colors.pink),
-      labelName: label,
       validator: (value) => Validators().requiredField(value),
     );
+  }
+
+  /// 🔹 SAVE ACTION
+  void _onSave() {
+    if (!formKey.currentState!.validate()) return;
+
+    final result = ServiceModel(
+      name: serviceNameController.text.trim(),
+      price: priceController.text.trim(),
+      description: descriptionController.text.trim(),
+      status: controller.isServiceStatus.value ? "Active" : "Inactive",
+      images: controller.getFinalImages(),
+      category: controller.selectedCategories.value,
+      isSelected: false.obs,
+    );
+
+    Get.back(result: result);
   }
 }

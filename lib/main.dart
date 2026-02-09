@@ -153,7 +153,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       title: 'Varnika',
       initialBinding: SplashBindings(),
       getPages: AppPages.pages,
-      initialRoute: AppRoutes.dashboard,
+      initialRoute: AppRoutes.splash,
       navigatorKey: Get.key,
     );
   }

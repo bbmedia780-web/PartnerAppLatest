@@ -27,6 +27,7 @@ class ServiceController extends GetxController {
           address: '202, Shree Residency, Near Sarthana Jakat Naka, Surat, Gujarat 395006',
           workingDays: 'Monday to saturday',
           workingHours: '09:00 Am to 08:00 Pm',
+          price:'200'
         ),
         ServiceModel(
           id: '2',
@@ -39,6 +40,7 @@ class ServiceController extends GetxController {
           address: '202, Shree Residency, Near Sarthana Jakat Naka, Surat, Gujarat 395006',
           workingDays: 'Monday to saturday',
           workingHours: '09:00 Am to 08:00 Pm',
+            price:'350'
         ),
         ServiceModel(
           id: '3',
@@ -50,7 +52,8 @@ class ServiceController extends GetxController {
           loungeName: 'Ziva Bridal Lounge',
           address: '202, Shree Residency, Near Sarthana Jakat Naka, Surat, Gujarat 395006',
           workingDays: 'Monday to saturday',
-          workingHours: '09:00 Am to 08:00 Pm',
+          workingHours: '09:00 Am to 08:00 Pm', price:'450'
+
         ),
         ServiceModel(
           id: '4',
@@ -63,6 +66,7 @@ class ServiceController extends GetxController {
           address: '202, Shree Residency, Near Sarthana Jakat Naka, Surat, Gujarat 395006',
           workingDays: 'Monday to saturday',
           workingHours: '09:00 Am to 08:00 Pm',
+            price:'150'
         ),
       ];
       isLoading.value = false;
