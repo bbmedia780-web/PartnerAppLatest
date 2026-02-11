@@ -51,7 +51,7 @@ class BookingTabCard extends StatelessWidget {
               ],
             ),
           ),
-          Divider(thickness: 1,color: dividerColor.withOpacity(0.5),height: 1,),
+          Divider(thickness: 1,color: dividerColor.withValues(alpha:0.5),height: 1,),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(

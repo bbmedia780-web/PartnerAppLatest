@@ -42,7 +42,7 @@ class CouponCutoutCard extends StatelessWidget {
                     child: Text(
                       'DISCOUNT',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha:0.9),
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                         letterSpacing: 1.3,
@@ -106,29 +106,29 @@ class CouponCutoutCard extends StatelessWidget {
     );
   }
 }
-class _ActionButton extends StatelessWidget {
-  final String text;
-
-  const _ActionButton({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-}
+// class _ActionButton extends StatelessWidget {
+//   final String text;
+//
+//   const _ActionButton({required this.text});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+//       decoration: BoxDecoration(
+//         color: Colors.black.withValues(alpha:0.1),
+//         borderRadius: BorderRadius.circular(6),
+//       ),
+//       child: Text(
+//         text,
+//         style: const TextStyle(
+//           fontSize: 10,
+//           fontWeight: FontWeight.bold,
+//         ),
+//       ),
+//     );
+//   }
+// }
 class TicketClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:image_picker/image_picker.dart';
 import 'package:varnika_app/utils/image_helpers.dart';
 
 import '../../../../../../utils/library_utils.dart';
@@ -22,9 +21,9 @@ class ProfileController extends GetxController {
   void pickProfileImage()async{
     profileImage.value = await ImagePickerHelper.showPickerDialog(Get.context!) ?? File("");
     if (profileImage.value!=null) {
-      print("Image Path: ${profileImage.value?.path}");
+      debugPrint("Image Path: ${profileImage.value?.path}");
     } else {
-      print("No image selected");
+      debugPrint("No image selected");
     }
   }
 

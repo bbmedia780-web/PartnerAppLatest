@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:get/get.dart' as getx;
+import 'package:get/get.dart' as get_x;
 import 'package:varnika_app/routes/app_routes.dart';
 import '../../../../../../utils/global.dart';
 import 'api_end_point.dart';
@@ -22,14 +22,14 @@ class ApiClient {
             : Options(headers: ApiConstant().headers),
       );
       return response;
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if (e.response != null) {
         if (e.response?.statusCode == 400) {
           if (e.response?.data["message"] != null) {
             ShowToast.error(
                 e.response?.data["message"] ?? "Something want wrong!");
           } else {
-            getx.Get.offAndToNamed(AppRoutes.homeScreen);
+            get_x.Get.offAndToNamed(AppRoutes.homeScreen);
           }
         }
         if (e.response?.statusCode == 500) {
@@ -38,6 +38,7 @@ class ApiClient {
         }
       } else {}
     }
+    return null;
   }
 
   Future<Response?> postData(
@@ -57,7 +58,7 @@ class ApiClient {
       );
 
       return response;
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       // Handle the error
       if (e.response != null) {
         if (e.response?.statusCode == 400) {
@@ -65,7 +66,7 @@ class ApiClient {
             ShowToast.error(
                 e.response?.data["message"] ?? "Something want wrong!");
           } else {
-            getx.Get.offAndToNamed(AppRoutes.homeScreen);
+            get_x.Get.offAndToNamed(AppRoutes.homeScreen);
           }
         }
         if (e.response?.statusCode == 500) {
@@ -74,6 +75,7 @@ class ApiClient {
         }
       } else {}
     }
+    return null;
   }
 
   Future<Response?> deleteData(
@@ -90,7 +92,7 @@ class ApiClient {
             : Options(headers: ApiConstant().headers),
       );
       return response;
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       // Handle the error
       if (e.response != null) {
         ShowToast.error(

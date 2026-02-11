@@ -9,13 +9,13 @@ class CrossFade extends StatelessWidget {
   final bool useCenter;
 
   const CrossFade({
-    Key? key,
+    super.key,
     required this.child,
     this.hiddenChild,
     this.show = false,
     this.padding,
     this.useCenter = true,
-  }) : super(key: key);
+  });
   @override
   Widget build(BuildContext context) {
     return Container(

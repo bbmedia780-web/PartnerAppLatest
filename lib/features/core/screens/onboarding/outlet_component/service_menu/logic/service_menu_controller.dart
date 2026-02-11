@@ -90,9 +90,9 @@ class ServiceMenuController extends GetxController{
     selectedImage.value = await ImagePickerHelper.showPickerDialog(Get.context!) ?? File("");
 
     if (selectedImage.value.path.isNotEmpty) {
-      print("Image Path: ${selectedImage.value.path}");
+      debugPrint("Image Path: ${selectedImage.value.path}");
     } else {
-      print("No image selected");
+      debugPrint("No image selected");
     }
   }
 
@@ -103,10 +103,10 @@ class ServiceMenuController extends GetxController{
       if (pickedImages.isNotEmpty) {
         selectedImages.addAll(pickedImages);
         selectedImages.refresh();
-        print("Added ${pickedImages.length} images. Total: ${selectedImages.length}");
+        debugPrint("Added ${pickedImages.length} images. Total: ${selectedImages.length}");
       }
     } catch (e) {
-      print("Error picking multiple images: $e");
+      debugPrint("Error picking multiple images: $e");
     }
   }
 
@@ -117,11 +117,11 @@ class ServiceMenuController extends GetxController{
       if (pickedImage != null && pickedImage.path.isNotEmpty) {
         selectedImages.add(pickedImage);
         selectedImages.refresh();
-        print("Added image: ${pickedImage.path}");
-        print("Total images: ${selectedImages.length}");
+        debugPrint("Added image: ${pickedImage.path}");
+        debugPrint("Total images: ${selectedImages.length}");
       }
     } catch (e) {
-      print("Error picking single image: $e");
+      debugPrint("Error picking single image: $e");
     }
   }
 
@@ -165,7 +165,7 @@ class ServiceMenuController extends GetxController{
         }
       }
     } catch (e) {
-      print("Error picking image for service: $e");
+      debugPrint("Error picking image for service: $e");
     }
   }
 
@@ -184,7 +184,7 @@ class ServiceMenuController extends GetxController{
         }
       }
     } catch (e) {
-      print("Error picking multiple images for service: $e");
+      debugPrint("Error picking multiple images for service: $e");
     }
   }
 

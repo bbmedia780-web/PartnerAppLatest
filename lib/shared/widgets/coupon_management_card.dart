@@ -32,7 +32,7 @@ class CouponManagementCard extends StatelessWidget {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: whiteColor.withOpacity(0.2),
+                  color: whiteColor.withValues(alpha:0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -49,7 +49,7 @@ class CouponManagementCard extends StatelessWidget {
                     Text(
                       'Coupon management',
                       style: AppTextStyles.regular.copyWith(
-                        color: whiteColor.withOpacity(0.9),
+                        color: whiteColor.withValues(alpha:0.9),
                         fontSize: 14,
                       ),
                     ),
@@ -102,7 +102,7 @@ class CouponManagementCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: whiteColor.withOpacity(0.2),
+          color: whiteColor.withValues(alpha:0.2),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(

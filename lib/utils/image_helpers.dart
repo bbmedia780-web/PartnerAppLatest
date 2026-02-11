@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:image_picker/image_picker.dart';
 import '../../../../../utils/library_utils.dart';
 
 class ImagePickerHelper {

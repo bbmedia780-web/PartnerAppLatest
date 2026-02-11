@@ -1,4 +1,3 @@
-import 'dart:io';
 import '../../../../../../../utils/library_utils.dart';
 
 class AddServiceDialog extends StatefulWidget {
@@ -28,13 +27,13 @@ class _AddServiceDialogState extends State<AddServiceDialog> {
 
       serviceNameController.text = service.name;
       priceController.text = service.price;
-      descriptionController.text = service.description ?? "";
+      descriptionController.text = service.description;
 
       controller.isServiceStatus.value =
           service.status.toLowerCase() == "active";
 
       controller.selectedCategories.value =
-          service.category ?? controller.selectedCategories.value;
+          service.category;
 
       /// clear & load images
       controller.selectedImages.clear();

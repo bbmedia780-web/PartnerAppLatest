@@ -12,7 +12,6 @@ class ReelsScreen extends StatefulWidget {
 class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
   late ReelsController controller;
   bool _isDisposed = false;
-  int? _lastDashboardIndex;
   bool _isVisible = true;
   Worker? _dashboardTabListener; // Store listener to dispose it later
 
@@ -298,13 +297,15 @@ class _ReelsScreenState extends State<ReelsScreen> with WidgetsBindingObserver {
     });
     
     // Use WillPopScope to detect back button press
-    return WillPopScope(
-      onWillPop: () async {
-        // CRITICAL: Stop all videos and audio when navigating back (Instagram-like behavior)
-        _stopAllVideos();
-        controller.stopAllVideos();
-        debugPrint('✅ Back button pressed - all videos and audio stopped');
-        return true; // Allow navigation
+    return PopScope(
+      canPop: true, // allow pop
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) {
+          // Stop all videos and audio
+          _stopAllVideos();
+          controller.stopAllVideos();
+          debugPrint('✅ Back button pressed - all videos and audio stopped');
+        }
       },
       child: Scaffold(
         backgroundColor: Colors.black,

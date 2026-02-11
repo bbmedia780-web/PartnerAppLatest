@@ -44,8 +44,8 @@ class CashfreeKycService {
         "consent_text": "I hereby declare that I am providing my Aadhaar voluntarily",
       });
 
-      print('URL - $_baseUrl/offline-aadhaar/otp');
-      print('Request - $body');
+      // print('URL - $_baseUrl/offline-aadhaar/otp');
+      // print('Request - $body');
       final response = await http.post(
         Uri.parse('$_baseUrl/offline-aadhaar/otp'),
         headers: {
@@ -56,7 +56,7 @@ class CashfreeKycService {
         },
         body: body,
       );
-      print('Response - $response');
+      // print('Response - $response');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -91,8 +91,8 @@ class CashfreeKycService {
         'ref_id': referenceId.toString(),
         'otp': otp,
       });
-      print('URL - $_baseUrl/offline-aadhaar/verify');
-      print('Request - $body');
+      // print('URL - $_baseUrl/offline-aadhaar/verify');
+      // print('Request - $body');
       final response = await http.post(
         Uri.parse('$_baseUrl/offline-aadhaar/verify'),
         headers: {
@@ -102,7 +102,7 @@ class CashfreeKycService {
         },
         body: body,
       );
-      print('Response - $response');
+      // print('Response - $response');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -134,8 +134,8 @@ class CashfreeKycService {
         'pan': panNumber,
       });
 
-        print('URL - $_baseUrl/pan');
-        print('Request - $body');
+        // print('URL - $_baseUrl/pan');
+        // print('Request - $body');
       final response = await http.post(
         Uri.parse('$_baseUrl/pan'),
         headers: _getHeaders(),
@@ -144,7 +144,7 @@ class CashfreeKycService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print('Data -- > ${data}');
+        // print('Data -- > ${data}');
         if(data['pan_status']=="VALID"){
           return {
             'success': true,
@@ -180,18 +180,16 @@ class CashfreeKycService {
       final body = jsonEncode({
         'gstin': gstin,
       });
-      print('URL - $_baseUrl/gstin');
-      print('Request - $body');
-      final response = await http.post(
+       final response = await http.post(
         Uri.parse('$_baseUrl/gstin'),
         headers: _getHeaders(),
         body: body,
       );
-      print('Response :${response}');
+      // print('Response :${response}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print('data :${data}');
+        // print('data :${data}');
         return {
           'success': true,
           'data': data,
@@ -224,18 +222,18 @@ class CashfreeKycService {
         'ifsc': ifscCode,
         'name': accountHolderName,
       });
-      print('URL - $_baseUrl/bank-account/sync');
-      print('Request - $body');
+      // print('URL - $_baseUrl/bank-account/sync');
+      // print('Request - $body');
       final response = await http.post(
         Uri.parse('$_baseUrl/bank-account/sync'),
         headers: _getHeaders(),
         body: body,
       );
 
-      print('Response : ${response.body}');
+      // print('Response : ${response.body}');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print("Data : ${data}");
+        // print("Data : ${data}");
         if(data['account_status']=="VALID"){
           return {
             'success': true,

@@ -1,4 +1,3 @@
-import '../logic/booking_binding.dart';
 import '../widgets/booking_list_card.dart';
 import '../../../../../shared/widgets/date_selector_field.dart';
 import '../widgets/booking_request_card.dart';

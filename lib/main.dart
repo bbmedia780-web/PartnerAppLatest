@@ -59,8 +59,8 @@ void main() async {
     }
     // In debug mode, print errors for debugging
     if (kDebugMode) {
-      print('Unhandled error: $error');
-      print('Stack trace: $stack');
+      debugPrint('Unhandled error: $error');
+      debugPrint('Stack trace: $stack');
     }
   });
 }

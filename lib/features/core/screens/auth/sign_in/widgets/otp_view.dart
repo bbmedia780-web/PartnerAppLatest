@@ -1,7 +1,4 @@
-import 'package:flutter/services.dart';
-import 'package:pinput/pinput.dart';
 import '../../../../../../utils/library_utils.dart';
-import '../../../../../../utils/global.dart';
 
 class OtpView extends StatefulWidget {
   const OtpView({super.key, required this.controller});

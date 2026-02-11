@@ -1,4 +1,3 @@
-import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import '../outlet_component/address/address_model.dart';
 import '../../../../../../utils/library_utils.dart';
@@ -95,7 +94,7 @@ class OnBoardingController extends GetxController{
         );
       }
     } catch (e) {
-      print("Error in reverse geocoding: $e");
+      // print("Error in reverse geocoding: $e");
       ShowToast.error('Could not get address from location');
     }
   }

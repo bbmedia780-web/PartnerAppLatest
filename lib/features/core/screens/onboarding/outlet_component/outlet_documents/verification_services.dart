@@ -1,11 +1,12 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 
 import '../../../../../../model/verification_res_model.dart';
 
 // IMPORTANT: Replace this with your actual backend API endpoint
-const String _BASE_URL = 'YOUR_BACKEND_SERVER_URL/api/cashfree';
+const String baseUrl = 'YOUR_BACKEND_SERVER_URL/api/cashfree';
 
 class VerificationService {
   // You'll need an Authorization Token or similar for your backend
@@ -40,11 +41,11 @@ class VerificationService {
       body: body,
     );
 
-    print('URL - $_baseUrl/aadhaar/generateOtp\n Headers : ${_getHeaders()}');
+    debugPrint('URL - $_baseUrl/aadhaar/generateOtp\n Headers : ${_getHeaders()}');
     if (response.statusCode == 200) {
       return jsonDecode(response.body); // Returns reference_id, status, etc.
     } else {
-      print('Error: ${response.statusCode} - ${response.body}');
+      debugPrint('Error: ${response.statusCode} - ${response.body}');
       return null;
     }
   }
@@ -66,7 +67,7 @@ class VerificationService {
     if (response.statusCode == 200) {
       return jsonDecode(response.body); // Returns verified details like name, dob, etc.
     } else {
-      print('Error: ${response.statusCode} - ${response.body}');
+      debugPrint('Error: ${response.statusCode} - ${response.body}');
       return null;
     }
   }
@@ -77,7 +78,7 @@ class VerificationService {
 
 
   Future<VerificationResponse> verifyDocument(String endpoint, Map<String, dynamic> data) async {
-    final uri = Uri.parse('$_BASE_URL/$endpoint');
+    final uri = Uri.parse('$baseUrl/$endpoint');
     try {
       final response = await http.post(
         uri,

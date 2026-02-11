@@ -99,10 +99,10 @@ class OutletTypeSelection extends GetView<OnBoardingController> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? appColor.withOpacity(0.15) : Colors.white,
+          color: isSelected ? appColor.withValues(alpha:0.15) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? appColor : kColorGray.withOpacity(0.4),
+            color: isSelected ? appColor : kColorGray.withValues(alpha:0.4),
             width: isSelected ? 2 : 1,
           ),
         ),

@@ -206,8 +206,7 @@ class _VideoTrimmingBottomSheetState extends State<VideoTrimmingBottomSheet> {
         }
       } else {
           // CRITICAL: For videos, generate thumbnails at different time positions (silently)
-          debugPrint('🔄 Generating ${thumbnailCount} video thumbnails silently in background...');
-          
+
           // Get actual video duration
           double maxDuration = _maxDuration;
           if (widget.controller.videoController.value != null &&
@@ -271,7 +270,7 @@ class _VideoTrimmingBottomSheetState extends State<VideoTrimmingBottomSheet> {
         setState(() {
           _thumbnails = thumbnails;
         });
-          debugPrint('✅ ${thumbnails.where((t) => t != null).length}/${thumbnailCount} thumbnails loaded silently');
+          debugPrint('✅ ${thumbnails.where((t) => t != null).length}/$thumbnailCount thumbnails loaded silently');
       }
     } catch (e) {
         debugPrint('Error loading thumbnails silently: $e');
@@ -393,7 +392,6 @@ class _VideoTrimmingBottomSheetState extends State<VideoTrimmingBottomSheet> {
       debugPrint('Error in _trimVideo: $e');
       // ShowToast.show(message: 'Error: ${e.toString()}', type: ToastType.error);
     } finally {
-      if (!mounted) return;
       setState(() {
         _isProcessing = false;
       });
@@ -1021,7 +1019,7 @@ class _VideoTrimmingBottomSheetState extends State<VideoTrimmingBottomSheet> {
                             //   ignoring: true,
                             //   child: Container(
                             //     decoration: BoxDecoration(
-                            //       color: appColor.withOpacity(0.3),
+                            //       color: appColor.withValues(alpha:0.3),
                             //       border: Border.symmetric(
                             //         vertical:
                             //         BorderSide(color: appColor, width: 2),

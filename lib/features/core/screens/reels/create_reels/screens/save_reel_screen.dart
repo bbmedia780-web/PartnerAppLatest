@@ -1,8 +1,6 @@
-import 'dart:io';
-
-import 'package:varnika_app/features/core/screens/reels/create_reels/widgets/hashtag_selection_bottom_sheet.dart';
 
 import '../../../../../../utils/library_utils.dart';
+import '../widgets/hashtag_selection_bottom_sheet.dart';
 
 class SaveReelScreen extends StatefulWidget {
   const SaveReelScreen({super.key});
@@ -18,7 +16,6 @@ class _SaveReelScreenState extends State<SaveReelScreen> {
   OverlayEntry? _hashtagOverlay;
   bool _isHashtagBoxOpen = false;
   Uint8List? _videoThumbnail;
-  File? _thumbnailFile;
   bool _isLoadingThumbnail = false;
   String? _lastMediaPath;
 
@@ -28,12 +25,8 @@ class _SaveReelScreenState extends State<SaveReelScreen> {
     _captionController.addListener(_onCaptionChanged);
     _ensureVideoInitialized();
   }
-
-  // Ensure video is initialized and playing
   Future<void> _ensureVideoInitialized() async {
     final ctrl = Get.find<CreateReelsController>();
-    
-    // If it's a video and not initialized, initialize it
     if (ctrl.isVideo.value) {
       final media = ctrl.processedVideoFile.value ??
           ctrl.generatedVideo.value ??
@@ -45,7 +38,6 @@ class _SaveReelScreenState extends State<SaveReelScreen> {
             !ctrl.videoController.value!.value.isInitialized) {
           await ctrl.reinitializeVideo(media);
         } else if (!ctrl.videoController.value!.value.isPlaying) {
-          // If initialized but not playing, start playback
           await ctrl.videoController.value!.play();
         }
       }
@@ -241,7 +233,6 @@ class _SaveReelScreenState extends State<SaveReelScreen> {
     if (media == null) {
       setState(() {
         _videoThumbnail = null;
-        _thumbnailFile = null;
         _lastMediaPath = null;
       });
       return;
@@ -261,7 +252,6 @@ class _SaveReelScreenState extends State<SaveReelScreen> {
         if (mounted) {
           setState(() {
             _videoThumbnail = imageBytes;
-            _thumbnailFile = media;
             _isLoadingThumbnail = false;
           });
         }
@@ -577,7 +567,8 @@ class _SaveReelScreenState extends State<SaveReelScreen> {
                       borderRadius: BorderRadius.circular(18),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
+                          color: Colors.black.withValues(
+                              alpha: 0.3),
                           blurRadius: 8,
                           offset: Offset(0, 2),
                         ),
@@ -595,7 +586,8 @@ class _SaveReelScreenState extends State<SaveReelScreen> {
                             top: 8,
                             right: 8,
                             child: Material(
-                              color: Colors.black.withOpacity(0.5),
+                              color: Colors.black.withValues(
+                                  alpha: 0.5),
                               borderRadius: BorderRadius.circular(20),
                               child: InkWell(
                                 onTap: _editThumbnail,
@@ -820,8 +812,10 @@ class _SaveReelScreenState extends State<SaveReelScreen> {
                       colors: [
                         Colors.transparent,
                         Colors.transparent,
-                        Colors.black.withOpacity(0.5),
-                        Colors.black.withOpacity(0.8),
+                        Colors.black.withValues(
+                            alpha:0.5),
+                        Colors.black.withValues(
+                            alpha:0.8),
                       ],
                       stops: [0.0, 0.5, 0.8, 1.0],
                     ),
@@ -881,8 +875,8 @@ class _SaveReelScreenState extends State<SaveReelScreen> {
                       colors: [
                         Colors.transparent,
                         Colors.transparent,
-                        Colors.black.withOpacity(0.5),
-                        Colors.black.withOpacity(0.8),
+                        Colors.black.withValues(alpha:0.5),
+                        Colors.black.withValues(alpha:0.8),
                       ],
                       stops: [0.0, 0.5, 0.8, 1.0],
                     ),

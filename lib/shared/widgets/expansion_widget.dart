@@ -49,7 +49,7 @@ class ExpansionWidget extends StatefulWidget {
   final EdgeInsets? padding;
 
   const ExpansionWidget(
-      {Key? key,
+      {super.key,
       this.validTextColor,
       required this.title,
       this.description,
@@ -65,8 +65,7 @@ class ExpansionWidget extends StatefulWidget {
       this.initialyExpanded = false,
       this.maxDescriptionLines,
       this.isValid = false,
-      this.padding})
-      : super(key: key);
+      this.padding});
 
   @override
   State<ExpansionWidget> createState() => _ExpansionWidgetState();
@@ -85,13 +84,11 @@ class _ExpansionWidgetState extends State<ExpansionWidget> {
   Widget build(BuildContext context) {
     return Padding(
       padding: widget.padding ?? const EdgeInsets.symmetric(vertical: 12),
-      child: Container(
-        child: Column(
-          children: <Widget>[
-            infoTile(),
-            childrenWidgets(),
-          ],
-        ),
+      child: Column(
+        children: <Widget>[
+          infoTile(),
+          childrenWidgets(),
+        ],
       ),
     );
   }

@@ -19,12 +19,12 @@ class CustomContainer extends StatelessWidget {
     return Container(
       width: Get.width,
       decoration: BoxDecoration(
-        border: Border.all(color:borderColor?? Color(0xFFD0D5DD).withOpacity(0.5)),
+        border: Border.all(color:borderColor?? Color(0xFFD0D5DD).withValues(alpha:0.5)),
         color:  whiteColor,
         borderRadius: BorderRadius.circular(radius??16),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFFD0D5DD).withOpacity(0.1),
+            color: Color(0xFFD0D5DD).withValues(alpha:0.1),
             spreadRadius: 0,
             blurRadius: 4,
             offset: Offset(0, 2)

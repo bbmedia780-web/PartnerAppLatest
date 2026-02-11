@@ -3,6 +3,8 @@ import '../../../../../../utils/library_utils.dart';
 class ServiceMenuScreen extends StatelessWidget {
   final ServiceMenuController controller = Get.put(ServiceMenuController());
 
+   ServiceMenuScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +22,7 @@ class ServiceMenuScreen extends StatelessWidget {
                       color: whiteColor,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha:0.05),
                           blurRadius: 10,
                           offset: Offset(0, 2),
                         ),
@@ -128,7 +130,7 @@ class ServiceMenuScreen extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                color: appColor.withOpacity(0.1),
+                                color: appColor.withValues(alpha:0.1),
                               ),
                               child: Icon(
                                 Icons.filter_alt_outlined,
@@ -151,7 +153,7 @@ class ServiceMenuScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               // border: Border.all(colors: borderGreyColor,width: 1),
-                              color: appColor.withOpacity(0.1),
+                              color: appColor.withValues(alpha:0.1),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -225,20 +227,20 @@ class ServiceMenuScreen extends StatelessWidget {
                         //   decoration: BoxDecoration(
                         //     gradient: LinearGradient(
                         //       colors: [
-                        //         appColor.withOpacity(0.15),
-                        //         appColor.withOpacity(0.08),
+                        //         appColor.withValues(alpha:0.15),
+                        //         appColor.withValues(alpha:0.08),
                         //       ],
                         //       begin: Alignment.topLeft,
                         //       end: Alignment.bottomRight,
                         //     ),
                         //     borderRadius: BorderRadius.circular(16),
                         //     border: Border.all(
-                        //       color: appColor.withOpacity(0.2),
+                        //       color: appColor.withValues(alpha:0.2),
                         //       width: 1.5,
                         //     ),
                         //     boxShadow: [
                         //       BoxShadow(
-                        //         color: appColor.withOpacity(0.1),
+                        //         color: appColor.withValues(alpha:0.1),
                         //         blurRadius: 8,
                         //         offset: Offset(0, 4),
                         //       ),
@@ -252,14 +254,14 @@ class ServiceMenuScreen extends StatelessWidget {
                         //         padding: EdgeInsets.all(10),
                         //         decoration: BoxDecoration(
                         //           gradient: LinearGradient(
-                        //             colors: [appColor, appColor.withOpacity(0.8)],
+                        //             colors: [appColor, appColor.withValues(alpha:0.8)],
                         //             begin: Alignment.topLeft,
                         //             end: Alignment.bottomRight,
                         //           ),
                         //           borderRadius: BorderRadius.circular(12),
                         //           boxShadow: [
                         //             BoxShadow(
-                        //               color: appColor.withOpacity(0.4),
+                        //               color: appColor.withValues(alpha:0.4),
                         //               blurRadius: 8,
                         //               offset: Offset(0, 2),
                         //             ),
@@ -304,7 +306,7 @@ class ServiceMenuScreen extends StatelessWidget {
                         //           Text(
                         //             "services",
                         //             style: AppTextStyles.regular.copyWith(
-                        //               color: kColorGray.withOpacity(0.7),
+                        //               color: kColorGray.withValues(alpha:0.7),
                         //               fontSize: 11,
                         //             ),
                         //           ),
@@ -318,8 +320,8 @@ class ServiceMenuScreen extends StatelessWidget {
                         //         decoration: BoxDecoration(
                         //           gradient: LinearGradient(
                         //             colors: [
-                        //               appColor.withOpacity(0.3),
-                        //               appColor.withOpacity(0.1),
+                        //               appColor.withValues(alpha:0.3),
+                        //               appColor.withValues(alpha:0.1),
                         //             ],
                         //             begin: Alignment.topCenter,
                         //             end: Alignment.bottomCenter,
@@ -438,7 +440,7 @@ class ServiceMenuScreen extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: appColor.withOpacity(0.04),
+                color: appColor.withValues(alpha:0.04),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -513,7 +515,7 @@ class ServiceMenuScreen extends StatelessWidget {
                 ],
               ),
             ),
-            // Divider(height: 1, thickness: 1, color: borderGreyColor.withOpacity(0.3)),
+            // Divider(height: 1, thickness: 1, color: borderGreyColor.withValues(alpha:0.3)),
             // Services List
             Padding(
               padding: EdgeInsets.all(2),
@@ -595,13 +597,13 @@ class ServiceMenuScreen extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             color: service.isSelected.value
-                ? appColor.withOpacity(0.05)
-                : kColorGray.withOpacity(0.02),
+                ? appColor.withValues(alpha:0.05)
+                : kColorGray.withValues(alpha:0.02),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: service.isSelected.value
-                  ? appColor.withOpacity(0.3)
-                  : borderGreyColor.withOpacity(0.5),
+                  ? appColor.withValues(alpha:0.3)
+                  : borderGreyColor.withValues(alpha:0.5),
               width: service.isSelected.value ? 2 : 1,
             ),
           ),
@@ -637,7 +639,7 @@ class ServiceMenuScreen extends StatelessWidget {
                     //     //       borderRadius: BorderRadius.circular(6),
                     //     //       boxShadow: [
                     //     //         BoxShadow(
-                    //     //           color: Colors.black.withOpacity(0.1),
+                    //     //           color: Colors.black.withValues(alpha:0.1),
                     //     //           blurRadius: 4,
                     //     //           offset: Offset(0, 2),
                     //     //         ),
@@ -737,7 +739,7 @@ class ServiceMenuScreen extends StatelessWidget {
                       padding: EdgeInsets.all(5),
                       // color: appColor,
                       // decoration: BoxDecoration(
-                      //   color: kColorGray.withOpacity(0.1),
+                      //   color: kColorGray.withValues(alpha:0.1),
                       //   borderRadius: BorderRadius.circular(8),
                       // ),
                       child: SizedBox(
@@ -773,7 +775,7 @@ class ServiceMenuScreen extends StatelessWidget {
     );
 
     if (category != null) {
-      print("New Category: $category");
+      debugPrint("New Category: $category");
     }
   }
 
@@ -784,7 +786,7 @@ class ServiceMenuScreen extends StatelessWidget {
     );
 
     if (category != null) {
-      print("New Category: $category");
+      debugPrint("New Category: $category");
     }
   }
 }

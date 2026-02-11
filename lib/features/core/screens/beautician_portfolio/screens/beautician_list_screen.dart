@@ -1,9 +1,5 @@
-import 'package:varnika_app/shared/widgets/custom_appbar.dart';
 
 import '../../../../../utils/library_utils.dart';
-import '../logic/beautician_portfolio_binding.dart';
-import '../logic/beautician_portfolio_controller.dart';
-import '../widgets/beautician_list_card.dart';
 
 class BeauticianListScreen extends StatefulWidget {
   const BeauticianListScreen({super.key});

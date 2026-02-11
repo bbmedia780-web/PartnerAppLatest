@@ -22,7 +22,7 @@ class Txt extends StatefulWidget {
   final bool strikeThrough;
 
   const Txt({
-    Key? key,
+    super.key,
     this.style,
     this.fontWeight,
     this.maxLines,
@@ -41,7 +41,7 @@ class Txt extends StatefulWidget {
     this.toRupees = false,
     this.toTimeAgo = false,
     this.strikeThrough = false,
-  }) : super(key: key);
+  });
 
   @override
   _TxtState createState() => _TxtState();
@@ -81,7 +81,7 @@ class _TxtState extends State<Txt> {
         overflow: widget.useoverflow ? TextOverflow.ellipsis : null,
         textAlign: widget.textAlign,
         maxLines: widget.maxLines,
-        textScaleFactor: 1,
+        textScaler: TextScaler.linear(1),
         style: TextStyle(
           decoration: widget.underline
               ? TextDecoration.underline

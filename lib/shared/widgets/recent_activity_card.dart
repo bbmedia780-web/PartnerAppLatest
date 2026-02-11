@@ -27,7 +27,7 @@ class RecentActivityCard extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.1),
+                color: iconColor.withValues(alpha:0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               padding: const EdgeInsets.all(10),

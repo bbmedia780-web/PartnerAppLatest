@@ -30,7 +30,7 @@ class AdCreditBalanceCard extends StatelessWidget {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: whiteColor.withOpacity(0.2),
+                  color: whiteColor.withValues(alpha:0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -47,7 +47,7 @@ class AdCreditBalanceCard extends StatelessWidget {
                     Text(
                       'Ad credit balance',
                       style: AppTextStyles.regular.copyWith(
-                        color: whiteColor.withOpacity(0.9),
+                        color: whiteColor.withValues(alpha:0.9),
                         fontSize: 14,
                       ),
                     ),

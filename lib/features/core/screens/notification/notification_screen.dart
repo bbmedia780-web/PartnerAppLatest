@@ -57,7 +57,6 @@ class NotificationsScreen extends StatelessWidget {
     if (!Get.isRegistered<NotificationController>()) {
       NotificationBinding().dependencies();
     }
-    final controller = Get.find<NotificationController>();
 
     return Scaffold(
       backgroundColor: whiteColor,
@@ -136,7 +135,7 @@ class NotificationsScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha:0.05),
                   blurRadius: 8,
                   offset: Offset(0, 3),
                 )
@@ -149,7 +148,7 @@ class NotificationsScreen extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: appColor.withOpacity(0.4),
+                    color: appColor.withValues(alpha:0.4),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(Icons.notifications_active, color: appColor),

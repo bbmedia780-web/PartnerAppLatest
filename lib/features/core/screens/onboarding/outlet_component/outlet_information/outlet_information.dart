@@ -460,7 +460,7 @@ class OutletInformationView extends GetView<OnBoardingController> {
                                                     padding: EdgeInsets.all(12),
                                                     decoration: BoxDecoration(
                                                       color: appColor
-                                                          .withOpacity(0.1),
+                                                          .withValues(alpha:0.1),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                             8,
@@ -488,7 +488,7 @@ class OutletInformationView extends GetView<OnBoardingController> {
                                                     padding: EdgeInsets.all(8),
                                                     decoration: BoxDecoration(
                                                       color: errorColor
-                                                          .withOpacity(0.1),
+                                                          .withValues(alpha:0.1),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                             8,

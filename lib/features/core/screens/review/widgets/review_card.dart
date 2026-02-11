@@ -23,7 +23,7 @@ class ReviewCard extends StatelessWidget {
                 height: 40,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: appColor.withOpacity(0.05),
+                  color: appColor.withValues(alpha:0.05),
                 ),
                 child: Center(child: Padding(
                   padding: const EdgeInsets.all(8.0),

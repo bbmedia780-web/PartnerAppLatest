@@ -20,9 +20,7 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
   static const double dotWidth = 4;
   double dotSpacing = 8; // Will be calculated based on song duration
   // CRITICAL: 1 dot per 1 second of music
-  static const double dotsPerSecond = 1.0; // 1 second of music = 1 dot
-  static const double minDotHeight = 6;
-  static const double maxDotHeight = 30;
+  static const double dotsPerSecond = 1.0;
 
   // Time calculation
   final double pixelsPerSecond = 100;
@@ -186,7 +184,6 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
         final selectionBoxWidth = screenWidth / 2.0;
         final viewportCenter = screenWidth / 2;
         final selectionBoxLeft = viewportCenter - (selectionBoxWidth / 2);
-        final selectionBoxRight = selectionBoxLeft + selectionBoxWidth;
 
         // CRITICAL: Selection box is FIXED at center of screen
         // Calculate initial scroll position so that startTime is under selection box left
@@ -237,7 +234,6 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
     if (!_scrollController.hasClients) return;
 
     final screenWidth = Get.width - 32;
-    final availableWidth = screenWidth - 40;
 
     final selectionBoxWidth = screenWidth / 2;
     final sidePadding = (screenWidth - selectionBoxWidth) / 2;
@@ -281,7 +277,9 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
 
     // Validate calculated times
     if (calculatedStartTime.isNaN || calculatedStartTime.isInfinite ||
-        calculatedEndTime.isNaN || calculatedEndTime.isInfinite) return;
+        calculatedEndTime.isNaN || calculatedEndTime.isInfinite) {
+      return;
+    }
 
     // CRITICAL: Clamp times to audio duration to prevent "Invalid argument(s)" error
     startTime = calculatedStartTime.clamp(0.0, audioDuration);
@@ -321,7 +319,9 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
 
     // Validate calculated times
     if (calculatedStartTime.isNaN || calculatedStartTime.isInfinite ||
-        calculatedEndTime.isNaN || calculatedEndTime.isInfinite) return;
+        calculatedEndTime.isNaN || calculatedEndTime.isInfinite) {
+      return;
+    }
 
     startTime = calculatedStartTime.clamp(0.0, audioDuration);
     endTime = calculatedEndTime.clamp(startTime + 0.1, audioDuration);
@@ -426,7 +426,6 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
     // Start exactly at the selection start
     _currentPlaybackPosition = startTime;
 
-    print('__currentPlaybackPosition :${_currentPlaybackPosition.seconds}');
     setState(() {});
 
     _positionSubscription = Timer.periodic(const Duration(milliseconds: 100), (timer) {
@@ -488,7 +487,6 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
         final musicIndex = widget.controller.selectedMusicIndex.value;
         if (musicIndex >= 0 && musicIndex < widget.controller.musicList.length) {
           final music = widget.controller.musicList[musicIndex];
-          print('music =========>>> ${music}');
           widget.controller.selectedMusic.value = music['name'] ?? '';
           widget.controller.selectedMusicArtist.value = music['artist'] ?? '';
           widget.controller.selectedMusicImgPath.value = music['image'] ?? '';
@@ -686,7 +684,7 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
                   height: 90,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: appColor.withOpacity(0.2),
+                      color: appColor.withValues(alpha:0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Stack(
@@ -765,9 +763,6 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
                                     / _calculatedPixelsPerSecond);
 
                                 final int selectionDotIndex = secondsFromSelectionStart.floor();
-                                print('dotScreenPosition :${dotScreenPosition}');
-                                final double dotStartTime = i.toDouble(); // 0,1,2,3...
-                                final double dotEndTime = dotStartTime + 1;
 
                                 final double playedInsideSelection =
                                 (_currentPlaybackPosition - startTime).clamp(0.0, endTime - startTime);
@@ -788,12 +783,12 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
                                   if (isCurrentlyPlaying) {
                                     dotColor = appColor;
                                   } else if (hasBeenPlayed) {
-                                    dotColor = appColor.withOpacity(0.8);
+                                    dotColor = appColor.withValues(alpha:0.8);
                                   } else {
                                     dotColor = whiteColor;
                                   }
                                 } else {
-                                  dotColor = whiteColor.withOpacity(0.3);
+                                  dotColor = whiteColor.withValues(alpha:0.3);
                                 }
 
 
@@ -974,7 +969,7 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: appColor.withOpacity(0.5),
+                                color: appColor.withValues(alpha:0.5),
                                 blurRadius: 12,
                                 offset: Offset(0, 4),
                               ),
@@ -1017,39 +1012,39 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
 }
 
 // Trim handle widget (same as working code)
-class _TrimHandle extends StatelessWidget {
-  final Function(double) onDrag;
-  final VoidCallback onDragStart;
-  final VoidCallback onDragEnd;
-
-  const _TrimHandle({
-    required this.onDrag,
-    required this.onDragStart,
-    required this.onDragEnd,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onHorizontalDragStart: (_) => onDragStart(),
-      onHorizontalDragUpdate: (d) => onDrag(d.delta.dx),
-      onHorizontalDragEnd: (_) => onDragEnd(),
-      onHorizontalDragCancel: () => onDragEnd(),
-      child: SizedBox(
-        width: 28,
-        height: double.infinity,
-        child: Center(
-          child: Container(
-            width: 4,
-            height: 36,
-            decoration: BoxDecoration(
-              color: appColor,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+// class _TrimHandle extends StatelessWidget {
+//   final Function(double) onDrag;
+//   final VoidCallback onDragStart;
+//   final VoidCallback onDragEnd;
+//
+//   const _TrimHandle({
+//     required this.onDrag,
+//     required this.onDragStart,
+//     required this.onDragEnd,
+//   });
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return GestureDetector(
+//       behavior: HitTestBehavior.opaque,
+//       onHorizontalDragStart: (_) => onDragStart(),
+//       onHorizontalDragUpdate: (d) => onDrag(d.delta.dx),
+//       onHorizontalDragEnd: (_) => onDragEnd(),
+//       onHorizontalDragCancel: () => onDragEnd(),
+//       child: SizedBox(
+//         width: 28,
+//         height: double.infinity,
+//         child: Center(
+//           child: Container(
+//             width: 4,
+//             height: 36,
+//             decoration: BoxDecoration(
+//               color: appColor,
+//               borderRadius: BorderRadius.circular(2),
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

@@ -8,7 +8,6 @@ class BookingRequestScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<BookingController>();
-    final double screenWidth = Get.width;
     final bool tablet = isTablet(context);
 
     return Scaffold(
@@ -72,7 +71,6 @@ class BookingRequestScreen extends StatelessWidget {
 }
 double getGridRatio(BuildContext context) {
   final width = MediaQuery.of(context).size.width;
-  print('Width :: ${width}');
   if (width <= 380) return 0.75;
   if (width <= 500) return 0.80;
   if (width <= 600) return 1.1;

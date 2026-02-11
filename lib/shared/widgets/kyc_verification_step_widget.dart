@@ -431,7 +431,7 @@ class KycVerificationStepWidget extends StatelessWidget {
               style: AppTextStyles.light.copyWith(fontSize: 14, color: blackColor),
               children: [
                 TextSpan(
-                  text: label + ' ',
+                  text: '$label ',
                   style:  AppTextStyles.subHeading.copyWith(fontWeight: FontWeight.w500,fontSize: 12),
                 ),
                 TextSpan(

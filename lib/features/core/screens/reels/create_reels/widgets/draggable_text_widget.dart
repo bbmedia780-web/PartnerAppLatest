@@ -21,7 +21,6 @@ class DraggableTextWidget extends StatefulWidget {
 
 class _DraggableTextWidgetState extends State<DraggableTextWidget> {
   Offset? _dragStartPosition; // Position when drag starts
-  Offset? _dragStartLocalPosition; // Local position of touch when drag starts
   double _lastScale = 1.0;
   double _lastRotation = 0.0;
   bool _isDragging = false;
