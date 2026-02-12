@@ -197,17 +197,86 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
                 //     fontSize: 18,
                 //   ),
                 // ),
-                TextButton(
-                      onPressed: _handleDone,
-                      child: Text(
-                        'Done',
-                        style: TextStyle(
-                    color: whiteColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: CustomButton(
+                        onTap: (){
+                          debugPrint('==============>>>${_textController.text} ');
+                          if (_textController.text.isNotEmpty) {
+                            if (_editingTextId != null) {
+                              // Update existing text
+                              final index = widget.controller.addedTexts.indexWhere(
+                                    (t) => t['id'] == _editingTextId,
+                              );
+                              if (index != -1) {
+                                // Update text content first
+                                widget.controller.addedTexts[index]['text'] = _textController.text;
+
+                                // Update all style properties
+                                widget.controller.updateTextStyle(
+                                  _editingTextId!,
+                                  isBold: _isBold,
+                                  isItalic: _isItalic,
+                                  hasUnderline: _hasUnderline,
+                                  color: _selectedColor,
+                                  fontSize: _fontSize,
+                                  fontStyle: _selectedFontStyle,
+                                  textAlign: _textAlign,
+                                  backgroundColor: _backgroundColor,
+                                );
+
+                                // Ensure background color is updated
+                                widget.controller.addedTexts[index]['backgroundColor'] = _backgroundColor;
+
+                                // Refresh the list to update UI
+                                widget.controller.addedTexts.refresh();
+
+                                // Clear editing ID BEFORE closing so text reappears immediately
+                                widget.controller.editingTextId.value = '';
+
+                                // Force controller update
+                                widget.controller.update();
+                              }
+                            } else {
+                              // Add new text
+                              final textWidth = _textController.text.length * _fontSize * 0.6;
+                              final centerX = (Get.width - textWidth) / 2;
+                              final centerY = Get.height / 3;
+
+                              widget.controller.addText(
+                                _textController.text,
+                                _selectedColor,
+                                _fontSize,
+                                Offset(centerX.clamp(0.0, Get.width - 100), centerY),
+                                fontStyle: _selectedFontStyle,
+                                isBold: _isBold,
+                                isItalic: _isItalic,
+                                hasUnderline: _hasUnderline,
+                                textAlign: _textAlign,
+                                backgroundColor: _backgroundColor,
+                              );
+                            }
+                            Get.back();
+                          } else {
+                            ShowToast.show(
+                              message: 'Please enter some text',
+                              type: ToastType.error,
+                            );
+                          }
+                        },
+                    title: 'Done',
+                    isDisable: false,
+                    bgColor: Colors.transparent,
+                      //   child: Text(
+                      //     'Done',
+                      //     style: TextStyle(
+                      // color: whiteColor,
+                      //       fontSize: 16,
+                      //       fontWeight: FontWeight.bold,
+                      //     ),
+                      //   ),
                       ),
-                    ),
+                ),
                   ],
                 ),
               ),
@@ -753,7 +822,7 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
       ),
     );
   }
-  
+
   void _handleDone() {
     if (_textController.text.isNotEmpty) {
       if (_editingTextId != null) {
@@ -764,7 +833,7 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
         if (index != -1) {
           // Update text content first
           widget.controller.addedTexts[index]['text'] = _textController.text;
-          
+
           // Update all style properties
           widget.controller.updateTextStyle(
             _editingTextId!,
@@ -777,45 +846,30 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
             textAlign: _textAlign,
             backgroundColor: _backgroundColor,
           );
-          
+
           // Ensure background color is updated
           widget.controller.addedTexts[index]['backgroundColor'] = _backgroundColor;
-          
+
           // Refresh the list to update UI
           widget.controller.addedTexts.refresh();
-          
+
           // Clear editing ID BEFORE closing so text reappears immediately
           widget.controller.editingTextId.value = '';
-          
+
           // Force controller update
           widget.controller.update();
         }
       } else {
         // Add new text
-        final screenWidth = MediaQuery.of(context).size.width;
-        final screenHeight = MediaQuery.of(context).size.height;
-
         final textWidth = _textController.text.length * _fontSize * 0.6;
-
-        double centerX = (screenWidth - textWidth) / 2;
-        double centerY = screenHeight / 3;
-
-// Prevent NaN / Infinity
-        if (centerX.isNaN || centerX.isInfinite) {
-          centerX = 0;
-        }
-        if (centerY.isNaN || centerY.isInfinite) {
-          centerY = 0;
-        }
-
-// Safe clamp
-        centerX = centerX.clamp(0.0, screenWidth - 100);
+        final centerX = (Get.width - textWidth) / 2;
+        final centerY = Get.height / 3;
 
         widget.controller.addText(
           _textController.text,
           _selectedColor,
           _fontSize,
-          const Offset(0, 0),// 👈 pass null offset
+          Offset(centerX.clamp(0.0, Get.width - 100), centerY),
           fontStyle: _selectedFontStyle,
           isBold: _isBold,
           isItalic: _isItalic,
@@ -823,8 +877,6 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
           textAlign: _textAlign,
           backgroundColor: _backgroundColor,
         );
-
-
       }
       Get.back();
     } else {

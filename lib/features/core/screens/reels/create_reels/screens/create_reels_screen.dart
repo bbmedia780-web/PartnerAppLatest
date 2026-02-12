@@ -1672,11 +1672,17 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
 
   // Show text editor
   void _showTextEditor(CreateReelsController controller) {
-    Get.bottomSheet(
-      TextEditorBottomSheet(controller: controller),
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-    );
+    showModalBottomSheet(
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        context: context, builder: (context){
+      return TextEditorBottomSheet(controller: controller);
+    });
+    // Get.bottomSheet(
+    //   TextEditorBottomSheet(controller: controller),
+    //   isScrollControlled: true,
+    //   backgroundColor: Colors.transparent,
+    // );
   }
 
   // Show filter bottom sheet
