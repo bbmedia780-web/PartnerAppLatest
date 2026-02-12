@@ -17,7 +17,7 @@ class CustomContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: Get.width,
+      width: (MediaQuery.of(context).size.width),
       decoration: BoxDecoration(
         border: Border.all(color:borderColor?? Color(0xFFD0D5DD).withValues(alpha:0.5)),
         color:  whiteColor,

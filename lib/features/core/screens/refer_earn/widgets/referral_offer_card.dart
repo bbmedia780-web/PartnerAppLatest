@@ -83,7 +83,7 @@ class ReferralOfferCard extends StatelessWidget {
             Center(
               child: CustomButton(
                 height: 40,
-                width: Get.width * 0.60,
+                width: (MediaQuery.of(context).size.width) * 0.60,
                 title: 'Refer Now',
                 onTap: onReferNow,
                 isDisable: false,

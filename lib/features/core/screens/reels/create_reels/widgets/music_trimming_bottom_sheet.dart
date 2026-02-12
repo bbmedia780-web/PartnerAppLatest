@@ -121,7 +121,7 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
     } else {
       dotSpacing = 4; // Default spacing for single dot
     }
-    final screenWidth = Get.width - 32;
+    final screenWidth = (MediaQuery.of(context).size.width) - 32;
     final selectionBoxWidth = screenWidth / 2;
     final sidePadding = (screenWidth - selectionBoxWidth) / 2;
 
@@ -180,7 +180,7 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
     // Selection box is fixed on screen, wave scrolls underneath
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
-        final screenWidth = Get.width - 32;
+        final screenWidth = (MediaQuery.of(context).size.width) - 32;
         final selectionBoxWidth = screenWidth / 2.0;
         final viewportCenter = screenWidth / 2;
         final selectionBoxLeft = viewportCenter - (selectionBoxWidth / 2);
@@ -233,7 +233,7 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
   void _clampScrollToAudioDuration() {
     if (!_scrollController.hasClients) return;
 
-    final screenWidth = Get.width - 32;
+    final screenWidth = (MediaQuery.of(context).size.width) - 32;
 
     final selectionBoxWidth = screenWidth / 2;
     final sidePadding = (screenWidth - selectionBoxWidth) / 2;
@@ -264,7 +264,7 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
 
     // CRITICAL: Selection box is FIXED at center of screen
     // Calculate what time is currently under the fixed selection box
-    final screenWidth = Get.width - 32;
+    final screenWidth = (MediaQuery.of(context).size.width) - 32;
     final viewportCenter = screenWidth / 2;
     final selectionBoxWidth = screenWidth / 2.0;
     final selectionBoxLeft = viewportCenter - (selectionBoxWidth / 2);
@@ -306,7 +306,7 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
 
     // CRITICAL: Selection box is FIXED at center of screen
     // Calculate what time is currently under the fixed selection box
-    final screenWidth = Get.width - 32;
+    final screenWidth = (MediaQuery.of(context).size.width) - 32;
     final viewportCenter = screenWidth / 2;
     final selectionBoxWidth = screenWidth / 2.0;
     // final selectionBoxLeft = viewportCenter - (selectionBoxWidth / 2);
@@ -339,7 +339,7 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
   //     // Validate inputs
   //     if (dx.isNaN || dx.isInfinite) return;
   //
-  //     final screenWidth = Get.width - 32;
+  //     final screenWidth = (MediaQuery.of(context).size.width) - 32;
   //     if (screenWidth <= 0 || screenWidth.isNaN || screenWidth.isInfinite) return;
   //
   //     final currentScroll = _scrollController.offset;
@@ -383,7 +383,7 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
   //     // Validate inputs
   //     if (dx.isNaN || dx.isInfinite) return;
   //
-  //     final screenWidth = Get.width - 32;
+  //     final screenWidth = (MediaQuery.of(context).size.width) - 32;
   //     if (screenWidth <= 0 || screenWidth.isNaN || screenWidth.isInfinite) return;
   //
   //     final currentScroll = _scrollController.offset;
@@ -565,7 +565,7 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
       right: false,
       bottom: true,
       child: Container(
-        height: Get.height * 0.92,
+        height: ((MediaQuery.of(context).size.height)) * 0.92,
         decoration: BoxDecoration(
           color: transparent,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -680,7 +680,7 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
 
                     // CRITICAL: Waveform UI with dynamic width based on wave length
                 SizedBox(
-                  width: Get.width - 32,
+                  width: (MediaQuery.of(context).size.width) - 32,
                   height: 90,
                   child: Container(
                     decoration: BoxDecoration(
@@ -709,7 +709,7 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
                               physics: const ClampingScrollPhysics(),
                               itemCount: totalDots, // +2 for spacers
                               itemBuilder: (_, index) {
-                                final screenWidth = Get.width - 32;
+                                final screenWidth = (MediaQuery.of(context).size.width) - 32;
                                 final selectionBoxWidth = screenWidth / 2.0;
                                 final sidePadding = (screenWidth - selectionBoxWidth) / 2.0;
                                 // CRITICAL: Get current scroll offset for real-time updates
@@ -823,7 +823,7 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
                         /// ─────────────────────────────────────────────
                         Builder(
                           builder: (_) {
-                            final screenWidth = Get.width - 32;
+                            final screenWidth = (MediaQuery.of(context).size.width) - 32;
                             final selectionBoxWidth = screenWidth / 2;
                             final left = (screenWidth - selectionBoxWidth) / 2;
 
@@ -847,7 +847,7 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
                         /// ─────────────────────────────────────────────
                         // Builder(
                         //   builder: (_) {
-                        //     final screenWidth = Get.width - 32;
+                        //     final screenWidth = (MediaQuery.of(context).size.width) - 32;
                         //     final selectionBoxWidth = screenWidth / 2;
                         //     final left = (screenWidth - selectionBoxWidth) / 2;
                         //
@@ -874,7 +874,7 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
                         /// ─────────────────────────────────────────────
                         // Builder(
                         //   builder: (_) {
-                        //     final screenWidth = Get.width - 32;
+                        //     final screenWidth = (MediaQuery.of(context).size.width) - 32;
                         //     final selectionBoxWidth = screenWidth / 2;
                         //     final right =
                         //         (screenWidth + selectionBoxWidth) / 2;

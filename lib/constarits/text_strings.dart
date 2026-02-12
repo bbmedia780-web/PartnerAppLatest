@@ -1,8 +1,8 @@
 //- notification-Screen
 import '../utils/library_utils.dart';
 
-final height = Get.height;
-final width = Get.width;
+// final height = ((MediaQuery.of(context).size.height));
+// final width = (MediaQuery.of(context).size.width);
 String addAttr(String svg) {
   // Add stroke and fill attributes to the <svg> tag
   if (!svg.contains('stroke=')) {

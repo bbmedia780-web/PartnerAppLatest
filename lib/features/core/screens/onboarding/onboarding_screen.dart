@@ -12,8 +12,8 @@ class OnBoardingScreen extends GetView<OnBoardingController> {
           Stack(
             children: [
               Container(
-                height: height * 0.38,
-                width: width,
+                height: (MediaQuery.of(context).size.height) * 0.38,
+                width: (MediaQuery.of(context).size.width),
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage(AppImages.img4),
@@ -73,7 +73,7 @@ class OnBoardingScreen extends GetView<OnBoardingController> {
               Positioned(
                 bottom: 0,
                 child: Container(
-                  width: Get.width,
+                  width: (MediaQuery.of(context).size.width),
                   height: 15,
                   decoration: BoxDecoration(
                     color: whiteColor,

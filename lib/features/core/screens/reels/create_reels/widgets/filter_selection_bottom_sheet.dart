@@ -17,7 +17,7 @@ class FilterSelectionBottomSheet extends StatelessWidget {
       right: false,
       bottom: true,
       child: Container(
-        height: Get.height * 0.5,
+        height: ((MediaQuery.of(context).size.height)) * 0.5,
         decoration: BoxDecoration(
           color: filterBottmBg,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

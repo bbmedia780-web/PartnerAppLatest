@@ -111,8 +111,8 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
       right: false,
       bottom: true,
       child: Container(
-        height: Get.height,
-        width: Get.width,
+        height: ((MediaQuery.of(context).size.height)),
+        width: (MediaQuery.of(context).size.width),
         decoration: BoxDecoration(
           color: Colors.black.withValues(alpha: 0.4),
         ),
@@ -127,7 +127,7 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
             child: Center(
               child: Container(
                 constraints: BoxConstraints(
-                  maxWidth: Get.width - 40,
+                  maxWidth: (MediaQuery.of(context).size.width) - 40,
                   minWidth: 50,
                 ),
                 decoration: BoxDecoration(
@@ -792,15 +792,30 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
         }
       } else {
         // Add new text
+        final screenWidth = MediaQuery.of(context).size.width;
+        final screenHeight = MediaQuery.of(context).size.height;
+
         final textWidth = _textController.text.length * _fontSize * 0.6;
-        final centerX = (Get.width - textWidth) / 2;
-        final centerY = Get.height / 3;
-        
+
+        double centerX = (screenWidth - textWidth) / 2;
+        double centerY = screenHeight / 3;
+
+// Prevent NaN / Infinity
+        if (centerX.isNaN || centerX.isInfinite) {
+          centerX = 0;
+        }
+        if (centerY.isNaN || centerY.isInfinite) {
+          centerY = 0;
+        }
+
+// Safe clamp
+        centerX = centerX.clamp(0.0, screenWidth - 100);
+
         widget.controller.addText(
           _textController.text,
           _selectedColor,
           _fontSize,
-          Offset(centerX.clamp(0.0, Get.width - 100), centerY),
+          const Offset(0, 0),// 👈 pass null offset
           fontStyle: _selectedFontStyle,
           isBold: _isBold,
           isItalic: _isItalic,
@@ -808,6 +823,8 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
           textAlign: _textAlign,
           backgroundColor: _backgroundColor,
         );
+
+
       }
       Get.back();
     } else {

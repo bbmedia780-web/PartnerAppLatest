@@ -26,7 +26,7 @@ class _SignInScreenState extends State<SignInScreen> {
           children: [
             // Carousel Section with Overlay - Full Width
             SizedBox(
-              height: height * 0.35,
+              height: (MediaQuery.of(context).size.height) * 0.35,
               width: double.infinity,
               child: Stack(
                 fit: StackFit.expand,
@@ -46,7 +46,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       onPageChanged: (index, reason) {
                         controller.changePageIndex(index);
                       },
-                      height: height * 0.35,
+                      height: (MediaQuery.of(context).size.height) * 0.35,
                       viewportFraction: 1.0,
                       autoPlay: true,
                       autoPlayInterval: const Duration(seconds: 3),
@@ -107,7 +107,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               padding: const EdgeInsets.only(right: 4),
                               child: Container(
                                 height: 2,
-                                width: (Get.width - 70 - (controller.lstImgs.length - 1) * 7) / controller.lstImgs.length,
+                                width: ((MediaQuery.of(context).size.width) - 70 - (controller.lstImgs.length - 1) * 7) / controller.lstImgs.length,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(50),
                                   color: controller.pageIndex.value == index

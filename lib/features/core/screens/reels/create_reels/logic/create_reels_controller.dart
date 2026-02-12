@@ -2921,7 +2921,7 @@ class CreateReelsController extends GetxController {
   }
   
   // Create finalized video with all edits (trim, text, filters, music)
-  Future<File?> createFinalizedVideo() async {
+  Future<File?> createFinalizedVideo(BuildContext context) async {
     if (selectedMedia.value == null) {
       // ShowToast.error('Please select media first');
       return null;
@@ -3031,8 +3031,8 @@ class CreateReelsController extends GetxController {
           
           // Calculate position relative to video dimensions
           // Position is stored relative to screen, need to scale to video dimensions
-          double xRatio = position.dx / Get.width;
-          double yRatio = position.dy / Get.height;
+          double xRatio = position.dx / (MediaQuery.of(context).size.width);
+          double yRatio = position.dy / (MediaQuery.of(context).size.height);
           int x = (xRatio * videoWidth).toInt().clamp(0, videoWidth);
           int y = (yRatio * videoHeight).toInt().clamp(0, videoHeight);
           
@@ -3238,7 +3238,7 @@ class CreateReelsController extends GetxController {
   }
   
   // Save finalized reel - creates finalized video and saves it
-  Future<void> saveFinalizedReel() async {
+  Future<void> saveFinalizedReel(BuildContext context) async {
     if (selectedMedia.value == null) {
       // ShowToast.error('Please select media first');
       return;
@@ -3250,7 +3250,7 @@ class CreateReelsController extends GetxController {
       
       // Create finalized video with all edits
       // ShowToast.show(message: 'Finalizing video...', type: ToastType.info);
-      final finalized = await createFinalizedVideo();
+      final finalized = await createFinalizedVideo(context);
       if (finalized == null) {
         // ShowToast.error('Failed to create finalized video');
         return;

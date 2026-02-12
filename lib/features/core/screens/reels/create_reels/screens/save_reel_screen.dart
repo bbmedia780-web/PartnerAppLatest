@@ -558,8 +558,8 @@ class _SaveReelScreenState extends State<SaveReelScreen> {
                 children: [
                   // Cover image preview (thumbnail)
                   Container(
-                    width: Get.width * 0.6,
-                    height: Get.width * 0.9,
+                    width: (MediaQuery.of(context).size.width) * 0.6,
+                    height: (MediaQuery.of(context).size.width) * 0.9,
                     // 9:16 aspect ratio
                     margin: EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -708,12 +708,12 @@ class _SaveReelScreenState extends State<SaveReelScreen> {
                   // Save button
                   Container(
                     margin: EdgeInsets.symmetric(horizontal: 16),
-                    width: Get.width,
+                    width: (MediaQuery.of(context).size.width),
                     child: CustomButton(
                       onTap: () async {
                         // Save finalized reel - creates finalized video and saves it
                         try {
-                          await ctrl.saveFinalizedReel();
+                          await ctrl.saveFinalizedReel(context);
                         } catch (e) {
                           debugPrint('Error saving reel: $e');
                         }
@@ -912,10 +912,10 @@ class _SaveReelScreenState extends State<SaveReelScreen> {
     }
 
     // Container dimensions
-    final containerWidth = Get.width * 0.6;
-    final containerHeight = Get.width * 0.9;
-    final screenWidth = Get.width;
-    final screenHeight = Get.height;
+    final containerWidth = (MediaQuery.of(context).size.width) * 0.6;
+    final containerHeight = (MediaQuery.of(context).size.width) * 0.9;
+    final screenWidth = (MediaQuery.of(context).size.width);
+    final screenHeight = ((MediaQuery.of(context).size.height));
 
     return ctrl.addedTexts.map((textData) {
       final text = textData['text'] as String? ?? '';

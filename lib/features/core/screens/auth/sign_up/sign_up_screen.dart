@@ -22,7 +22,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Scaffold(
       backgroundColor: appWhite,
       appBar: PreferredSize(
-        preferredSize: Size(Get.width, 60),
+        preferredSize: Size((MediaQuery.of(context).size.width), 60),
         child: GetBuilder<SignUpController>(builder: (controller) {
           return AppBar(
             leading: Padding(
@@ -40,20 +40,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
             elevation: 0,
             backgroundColor: Colors.transparent,
             bottom: PreferredSize(
-                preferredSize: Size(Get.width, 10),
+                preferredSize: Size((MediaQuery.of(context).size.width), 10),
                 child: Stack(
                   children: [
                     Container(
                       height: 3,
-                      width: Get.width,
+                      width: (MediaQuery.of(context).size.width),
                       color: dividerColor,
                     ),
                     Container(
                       height: 3,
                       color: appColor,
                       width: !controller.isFormComplete.value
-                          ? Get.width * 0.30
-                          : Get.width * 0.70,
+                          ? (MediaQuery.of(context).size.width) * 0.30
+                          : (MediaQuery.of(context).size.width) * 0.70,
                     ),
                   ],
                 )),

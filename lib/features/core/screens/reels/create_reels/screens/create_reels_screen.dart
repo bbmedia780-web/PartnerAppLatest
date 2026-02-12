@@ -613,8 +613,8 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
               // rely on the single global overlay loader instead of a second loader here.
               // Keep a simple black background so only ONE loader is visible in the whole UI.
               backgroundWidget = Container(
-                width: Get.width,
-                height: Get.height,
+                width: (MediaQuery.of(context).size.width),
+                height: ((MediaQuery.of(context).size.height)),
                 color: Colors.black,
               );
             } else if (controller.isVideo.value) {
@@ -642,8 +642,8 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                     }
 
                     return Container(
-                      width: Get.width,
-                      height: Get.height,
+                      width: (MediaQuery.of(context).size.width),
+                      height: ((MediaQuery.of(context).size.height)),
                       color: Colors.black,
                       child: Center(
                         child: AspectRatio(

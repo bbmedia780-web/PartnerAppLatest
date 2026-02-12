@@ -282,8 +282,9 @@ class _DraggableTextWidgetState extends State<DraggableTextWidget> {
 
           child: Transform.rotate(
             angle: rotation,
-            child: IntrinsicWidth(
-              child: Container(
+            // child: IntrinsicWidth(
+              child:
+              Container(
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: backgroundColor ?? Colors.transparent,
@@ -301,7 +302,7 @@ class _DraggableTextWidgetState extends State<DraggableTextWidget> {
                     hasUnderline: hasUnderline,
                   ),
                 ),
-              ),
+              // ),
             ),
           ),
         ),

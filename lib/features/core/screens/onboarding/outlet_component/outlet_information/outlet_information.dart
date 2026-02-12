@@ -187,7 +187,7 @@ class OutletInformationView extends GetView<OnBoardingController> {
                                       .contains(day);
 
                                   return SizedBox(
-                                    width: Get.width * 0.27,
+                                    width: (MediaQuery.of(context).size.width) * 0.27,
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
