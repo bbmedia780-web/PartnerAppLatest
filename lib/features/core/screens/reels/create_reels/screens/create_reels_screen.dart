@@ -1408,8 +1408,8 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
 
   // Show camera options
   void _showCameraOptions(CreateReelsController controller) {
-    Get.dialog(
-      AlertDialog(
+    showDialog(context: context, builder: (context){
+      return  AlertDialog(
         backgroundColor: Colors.grey[900],
         title: Text('Select Option', style: TextStyle(color: whiteColor)),
         content: Column(
@@ -1433,8 +1433,8 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
             ),
           ],
         ),
-      ),
-    );
+      );
+    });
   }
 
   // Step 1: Show audio bottom sheet (from music button)
@@ -1477,14 +1477,15 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
     controller.selectedMusicImgPath.value = '';
     controller.selectedMusicIndex.value = (-1);
     controller.isNextForTrim.value=false;
-    Get.bottomSheet(
-      MusicSelectionBottomSheet(
+    showModalBottomSheet(
+        isScrollControlled: true,
+        isDismissible: true,
+        enableDrag: true,
+        context: context, builder: (context){
+      return MusicSelectionBottomSheet(
         controller: controller,
-      ),
-      isScrollControlled: true,
-      isDismissible: true,
-      enableDrag: true,
-    ).then((_) async {
+      );
+    }).then((_) async {
       debugPrint(
           'Bottom sheet closed, wasMusicPlaying: $wasMusicPlaying, isMusicAppliedToVideo: ${controller
               .isMusicAppliedToVideo.value}');
@@ -1687,11 +1688,13 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
 
   // Show filter bottom sheet
   void _showFilterBottomSheet(CreateReelsController controller) {
-    Get.bottomSheet(
-      FilterSelectionBottomSheet(controller: controller),
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-    );
+    showModalBottomSheet(
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        context: context, builder: (context){
+      return FilterSelectionBottomSheet(controller: controller);
+    });
+
   }
 
   // Show trimming bottom sheet
@@ -1706,12 +1709,13 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
       // Continue anyway - thumbnails will be generated in background if not ready
     }
     
-    Get.bottomSheet(
-      VideoTrimmingBottomSheet(controller: controller),
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      isDismissible: true,
-      enableDrag: true,
-    );
+   showModalBottomSheet(
+       isScrollControlled: true,
+         backgroundColor: Colors.transparent,
+         isDismissible: true,
+         enableDrag: true,
+       context: context, builder: (context){
+     return VideoTrimmingBottomSheet(controller: controller);
+   });
   }
 }
