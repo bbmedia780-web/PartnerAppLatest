@@ -143,7 +143,7 @@ class ServiceMenuScreen extends StatelessWidget {
                         10.height,
                         GestureDetector(
                           onTap: () {
-                            openAddCategoryDialog();
+                            openAddCategoryDialog(context);
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(
@@ -357,7 +357,7 @@ class ServiceMenuScreen extends StatelessWidget {
                           ),
 
                           ...controller.categories.map(
-                            (cat) => _buildCategoryCard(cat),
+                            (cat) => _buildCategoryCard(cat,context),
                           ),
                           100.height,
                         ],
@@ -430,7 +430,7 @@ class ServiceMenuScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryCard(CategoryModel cat) {
+  Widget _buildCategoryCard(CategoryModel cat,BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(bottom: 5, top: 8, left: 8, right: 8),
       child: CustomContainer(
@@ -542,7 +542,7 @@ class ServiceMenuScreen extends StatelessWidget {
                           padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
                           child: GestureDetector(
                             onTap: () {
-                              openAddServiceDialog();
+                              openAddServiceDialog(context: context);
                             },
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -579,7 +579,7 @@ class ServiceMenuScreen extends StatelessWidget {
                   //   ),
                   // )
                   ...cat.services.map(
-                    (service) => _buildServiceRow(cat, service),
+                    (service) => _buildServiceRow(cat, service,context),
                   ),
                 ],
               ),
@@ -590,7 +590,7 @@ class ServiceMenuScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildServiceRow(CategoryModel cat, ServiceModel service) {
+  Widget _buildServiceRow(CategoryModel cat, ServiceModel service,BuildContext context) {
     return Obx(
       () => Padding(
         padding: const EdgeInsets.only(bottom: 5),
@@ -727,7 +727,7 @@ class ServiceMenuScreen extends StatelessWidget {
                 children: [
                   InkWell(
                     onTap: () {
-                      openAddServiceDialog(data: service);
+                      openAddServiceDialog(data: service, context: context);
                     },
 
                     child: Icon(Icons.edit, color: greyDarkLight, size: 18),
@@ -768,22 +768,23 @@ class ServiceMenuScreen extends StatelessWidget {
     );
   }
 
-  void openAddCategoryDialog() async {
-    var category = await Get.bottomSheet(
-      AddCategoryDialog(),
-      isScrollControlled: true,
-    );
-
+  void openAddCategoryDialog(BuildContext context) async {
+    var category = await  showModalBottomSheet(
+        isScrollControlled: true,
+        context: context, builder: (_){
+      return AddCategoryDialog();
+    });
     if (category != null) {
       debugPrint("New Category: $category");
     }
   }
 
-  void openAddServiceDialog({ServiceModel? data}) async {
-    var category = await Get.bottomSheet(
-      AddServiceDialog(data: data),
-      isScrollControlled: true,
-    );
+  void openAddServiceDialog({ServiceModel? data,required BuildContext context}) async {
+    var category = showModalBottomSheet(
+        isScrollControlled: true,
+        context: context, builder: (context){
+     return AddServiceDialog(data: data);
+    });
 
     if (category != null) {
       debugPrint("New Category: $category");

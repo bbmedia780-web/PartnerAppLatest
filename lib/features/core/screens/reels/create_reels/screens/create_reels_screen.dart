@@ -949,14 +949,15 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                 controller.selectedMusicIndex.value = (-1);
                                 controller.isNextForTrim.value=false;
 
-                                Get.bottomSheet(
-                                  MusicSelectionBottomSheet(
+                                showModalBottomSheet(
+                                    isScrollControlled: true,
+                                    isDismissible: true,
+                                    enableDrag: true,
+                                    context: context, builder: (context){
+                                  return MusicSelectionBottomSheet(
                                     controller: controller,
-                                  ),
-                                  isScrollControlled: true,
-                                  isDismissible: true,
-                                  enableDrag: true,
-                                ).then((_) async {
+                                  );
+                                }).then((_) async {
                                   debugPrint('Bottom sheet closed, wasMusicPlaying: $wasMusicPlaying, isMusicAppliedToVideo: ${controller.isMusicAppliedToVideo.value}');
                                   await Future.delayed(const Duration(milliseconds: 150));
 

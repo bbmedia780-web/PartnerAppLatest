@@ -424,16 +424,16 @@ class MusicSelectionBottomSheet extends StatelessWidget {
                             controller.isNextForTrim.value = true;
                             Get.back();
                             // Close music selection sheet
-                            Get.bottomSheet(
-                                  MusicTrimmingBottomSheet(
-                                    controller: controller,
-                                  ),
-                                  isScrollControlled: true,
-                                  backgroundColor: Colors.transparent,
-                                  isDismissible: true,
-                                  enableDrag: true,
-                                )
-                                .then((_) async {
+                            showModalBottomSheet(
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                isDismissible: true,
+                                enableDrag: true,
+                                context: context, builder: (context){
+                              return MusicTrimmingBottomSheet(
+                                controller: controller,
+                              );
+                            }).then((_) async {
                                   // CRITICAL: Add small delay to ensure bottom sheet is fully closed
                                   await Future.delayed(
                                     Duration(milliseconds: 100),

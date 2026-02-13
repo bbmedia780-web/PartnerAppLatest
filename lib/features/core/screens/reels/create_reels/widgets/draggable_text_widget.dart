@@ -319,16 +319,17 @@ class _DraggableTextWidgetState extends State<DraggableTextWidget> {
     if (textId != null) {
       widget.controller.editingTextId.value = textId;
     }
-    
-    // Import the text editor bottom sheet
-    Get.bottomSheet(
-      TextEditorBottomSheet(
+    showModalBottomSheet(
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        context: context, builder: (context){
+      return TextEditorBottomSheet(
         controller: widget.controller,
         existingTextData: textData,
-      ),
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-    );
+      );
+    });
+    
+    // Import the text editor bottom sheet
   }
   
   void _showEditDeleteDialog() {
