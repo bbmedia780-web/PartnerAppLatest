@@ -1,7 +1,4 @@
-import 'package:flutter/services.dart';
-import 'package:pinput/pinput.dart';
 import '../../../../../../utils/library_utils.dart';
-import '../../../../../../utils/global.dart';
 
 class OtpView extends StatefulWidget {
   const OtpView({super.key, required this.controller});
@@ -52,7 +49,7 @@ class _OtpViewState extends State<OtpView> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -180,6 +177,7 @@ class _OtpViewState extends State<OtpView> {
                   ),
                 ),
               ),
+              25.width,
             ],
           ),
         ],

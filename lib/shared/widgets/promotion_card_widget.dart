@@ -72,7 +72,7 @@ class PromotionCardWidget extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: successColor.withOpacity(0.2),
+                  color: successColor.withValues(alpha:0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -178,7 +178,7 @@ class PromotionCardWidget extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: BoxDecoration(
           color: isPrimary
-              ? kColorOrange.withOpacity(0.1)
+              ? kColorOrange.withValues(alpha:0.1)
               : isDestructive
                   ? Colors.transparent
                   : cardgreyColor,

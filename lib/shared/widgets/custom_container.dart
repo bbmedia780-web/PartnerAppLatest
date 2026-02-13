@@ -17,14 +17,14 @@ class CustomContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: Get.width,
+      width: (MediaQuery.of(context).size.width),
       decoration: BoxDecoration(
-        border: Border.all(color:borderColor?? Color(0xFFD0D5DD).withOpacity(0.5)),
+        border: Border.all(color:borderColor?? Color(0xFFD0D5DD).withValues(alpha:0.5)),
         color:  whiteColor,
         borderRadius: BorderRadius.circular(radius??16),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFFD0D5DD).withOpacity(0.1),
+            color: Color(0xFFD0D5DD).withValues(alpha:0.1),
             spreadRadius: 0,
             blurRadius: 4,
             offset: Offset(0, 2)

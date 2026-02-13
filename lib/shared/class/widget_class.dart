@@ -27,7 +27,7 @@ class Widgets {
   }
 
   static Color subtitleColor(BuildContext context) {
-    return Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.5);
+    return Theme.of(context).textTheme.bodyLarge!.color!.withValues(alpha:0.5);
   }
 
   static const Duration duration = Duration(milliseconds: 350);
@@ -41,16 +41,16 @@ class Widgets {
   static bool debugMode = kDebugMode;
 
   static List<String> generateTags(List sentences) {
-    List<String> _tags = [];
-    sentences.forEach((sentence) {
+    List<String> tags = [];
+    for (var sentence in sentences) {
       if (sentence != null) {
         List words = '$sentence'.toLowerCase().split(' ');
-        words.forEach((word) {
-          if (_tags.contains(word) == false) _tags.add(word);
-        });
+        for (var word in words) {
+          if (tags.contains(word) == false) tags.add(word);
+        }
       }
-    });
-    return _tags
+    }
+    return tags
       ..sort((b, a) => a.length.compareTo(b.length))
       ..removeWhere((element) => element.length < 3);
   }

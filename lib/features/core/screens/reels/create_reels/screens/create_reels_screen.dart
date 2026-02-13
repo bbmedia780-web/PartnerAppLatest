@@ -1,5 +1,3 @@
-
-
 import '../../../../../../utils/library_utils.dart';
 class CreateReelsScreen extends StatefulWidget {
   const CreateReelsScreen({super.key});
@@ -10,16 +8,12 @@ class CreateReelsScreen extends StatefulWidget {
 
 class _CreateReelsScreenState extends State<CreateReelsScreen>
     with WidgetsBindingObserver {
-  late final ScrollController _galleryScrollController;
   late final CreateReelsController controller;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
-    _galleryScrollController = ScrollController();
-
     controller = Get.put(CreateReelsController(), permanent: false);
 
     // Clear selection ONCE when screen opens
@@ -129,12 +123,6 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
         children: [
           Expanded(
             child: Obx(() {
-              print(
-                'controller.isProcessingVideo.value :${controller.isProcessingVideo.value}',
-              );
-              print(
-                'controller.isLoadingGallery.value :${controller.isLoadingGallery.value}',
-              );
               // Check if gallery is loading
               if (controller.isLoadingGallery.value &&
                   !controller.isProcessingVideo.value) {
@@ -224,7 +212,6 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                 key: ValueKey(controller.galleryPickerRefreshKey.value),
                 pathList: (paths) {
                         controller.handleSelectedMediaFromPicker(paths);
-                  print('paths ::${paths.toList()}');
                       },
 
                       mediaPickerParams: MediaPickerParamsModel(
@@ -319,8 +306,8 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                           Positioned.fill(
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                color: Colors.black.withOpacity(
-                                                  0.3,
+                                                color: Colors.black.withAlpha(
+                                                  3
                                                 ),
                                                 borderRadius:
                                                     BorderRadius.circular(6),
@@ -347,8 +334,8 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                                 width: 20,
                                                 height: 20,
                                                 decoration: BoxDecoration(
-                                                  color: Colors.black.withOpacity(
-                                                    0.7,
+                                                  color: Colors.black.withValues(
+                                                    alpha: 0.7,
                                                   ),
                                                   shape: BoxShape.circle,
                                                 ),
@@ -422,7 +409,8 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                           width: 20,
                                           height: 20,
                                           decoration: BoxDecoration(
-                                            color: Colors.black.withOpacity(
+                                            color: Colors.black.withValues(
+                                              alpha:
                                               0.7,
                                             ),
                                             shape: BoxShape.circle,
@@ -617,7 +605,6 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
 
             final media = controller.selectedMedia.value;
 
-            print('media :${media}');
             if (media == null) {
               backgroundWidget = Container(color: Colors.black);
             } else if (controller.isProcessingVideo.value &&
@@ -626,8 +613,8 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
               // rely on the single global overlay loader instead of a second loader here.
               // Keep a simple black background so only ONE loader is visible in the whole UI.
               backgroundWidget = Container(
-                width: Get.width,
-                height: Get.height,
+                width: (MediaQuery.of(context).size.width),
+                height: ((MediaQuery.of(context).size.height)),
                 color: Colors.black,
               );
             } else if (controller.isVideo.value) {
@@ -641,7 +628,6 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                   child: CircularProgressIndicator(),
                 );
               } else {
-                print('controller.lockedAspectRatio.value ;;; ${controller.lockedAspectRatio}');
                 // 0.5625
                 backgroundWidget = GetBuilder<CreateReelsController>(
                   builder: (controller) {
@@ -656,8 +642,8 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                     }
 
                     return Container(
-                      width: Get.width,
-                      height: Get.height,
+                      width: (MediaQuery.of(context).size.width),
+                      height: ((MediaQuery.of(context).size.height)),
                       color: Colors.black,
                       child: Center(
                         child: AspectRatio(
@@ -730,8 +716,10 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                           colors: [
                                             Colors.transparent,
                                             Colors.transparent,
-                                            Colors.black.withOpacity(0.5),
-                                            Colors.black.withOpacity(0.8),
+                                            Colors.black.withValues(
+                                                alpha:0.5),
+                                            Colors.black.withValues(
+                                                alpha: 0.8),
                                           ],
                                           stops: [0.0, 0.5, 0.8, 1.0],
                                         ),
@@ -768,11 +756,6 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                     needsGradient = false;
                   }
 
-                  // Safety check
-                  if (media == null) {
-                    return Container();
-                  }
-
                   return Stack(
                     children: [
                       // Music indicator (if music is selected) - Modern design
@@ -806,8 +789,10 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                 colors: [
                                   Colors.transparent,
                                   Colors.transparent,
-                                  Colors.black.withOpacity(0.5),
-                                  Colors.black.withOpacity(0.8),
+                                  Colors.black.withValues(
+                                      alpha:0.5),
+                                  Colors.black.withValues(
+                                      alpha:0.8),
                                 ],
                                 stops: [0.0, 0.5, 0.8, 1.0],
                               ),
@@ -983,7 +968,6 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                     controller.isMusicAppliedToVideo.refresh();
                                     controller.update();
                                   }
-                                  print('controller.isNextForTrim.value ====== ::${controller.isNextForTrim.value}');
                                   if(!controller.isNextForTrim.value){
                                     Map<String, dynamic>? data=await TrimmedMusicDB.getStoredTrimmedMusic();
 
@@ -1007,7 +991,6 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                         controller.videoController.value != null &&
                                         controller.videoController.value!.value.isInitialized) {
                                       try {
-                                        print(']]]]]]]]]]]]]]]]]]]]]]');
                                         // Re-add auto-play listener
                                         controller.videoController.value!.addListener(
                                           controller.ensureVideoLooping,
@@ -1040,11 +1023,8 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                         
                                         // If music is playing separately, mute video; otherwise play with sound
                                         if (wasMusicPlaying && controller.selectedMusicPath.value.isNotEmpty) {
-                                          print('+++++++++>>>>>>>>');
                                           await controller.videoController.value!.setVolume(0.0);
                                         } else {
-                                          print('---------->>>>>>>>');
-
                                           await controller.videoController.value!.setVolume(1.0);
                                         }
                                         await controller.videoController.value!.play();
@@ -1121,7 +1101,8 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                         vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: blackColor.withOpacity(0.3),
+                                        color: blackColor.withValues(
+                                            alpha:0.3),
                                         borderRadius: BorderRadius.circular(25),
                                       ),
                                       child: Row(
@@ -1130,7 +1111,8 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                           Container(
                                       padding: const EdgeInsets.all(6),
                                             decoration: BoxDecoration(
-                                              color: appColor.withOpacity(0.2),
+                                              color: appColor.withValues(
+                                                  alpha: 0.2),
                                               shape: BoxShape.circle,
                                             ),
                                             child: Icon(
@@ -1161,7 +1143,7 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                     //   child: Container(
                                     //     padding: const EdgeInsets.all(4),
                                     //     decoration: BoxDecoration(
-                                    //       color: appColor.withOpacity(0.2),
+                                    //       color: appColor.withValues(alpha:0.2),
                                     //       shape: BoxShape.circle,
                                     //     ),
                                     //     child: Icon(
@@ -1182,15 +1164,12 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                       ),
                     ),
                     Obx(
-                      () =>
-                          // CRITICAL: Show the global processing overlay ONLY when
-                          // no bottom sheet is open, so we never see two loaders
-                          // (one in bottom sheet and one on the main screen) at the same time.
-                          controller.isProcessingVideo.value &&
+                      () => controller.isProcessingVideo.value &&
                                   !(Get.isBottomSheetOpen ?? false)
                           ? Positioned.fill(
                               child: Container(
-                                    color: Colors.black.withOpacity(0.85),
+                                    color: Colors.black.withValues(
+                                        alpha: 0.85),
                                 child: Center(
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
@@ -1261,8 +1240,10 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
                             colors: [
-                              Colors.black.withOpacity(0.95),
-                              Colors.black.withOpacity(0.88),
+                              Colors.black.withValues(
+                                  alpha: 0.95),
+                              Colors.black.withValues(
+                                  alpha: 0.88),
                               Colors.transparent,
                             ],
                             stops: [0.0, 0.5, 1.0],
@@ -1271,36 +1252,34 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Container(
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  _buildEditTool(
-                                    icon: AppImages.audioIcon,
-                                    label: 'Audio',
-                                    onTap: () =>
-                                        _showMusicBottomSheet(controller),
-                                  ),
-                                  _buildEditTool(
-                                    icon: AppImages.textIcon,
-                                    label: 'Text',
-                                    onTap: () => _showTextEditor(controller),
-                                  ),
-                                  _buildEditTool(
-                                    icon: AppImages.imageFilterIcon,
-                                    label: 'Filter',
-                                    onTap: () =>
-                                        _showFilterBottomSheet(controller),
-                                  ),
-                                  _buildEditTool(
-                                    icon: AppImages.trimIcon,
-                                    label: 'Trim',
-                                    onTap: () =>
-                                        _showTrimmingBottomSheet(controller),
-                                  ),
-                                ],
-                              ),
+                            Row(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.spaceEvenly,
+                              children: [
+                                _buildEditTool(
+                                  icon: AppImages.audioIcon,
+                                  label: 'Audio',
+                                  onTap: () =>
+                                      _showMusicBottomSheet(controller),
+                                ),
+                                _buildEditTool(
+                                  icon: AppImages.textIcon,
+                                  label: 'Text',
+                                  onTap: () => _showTextEditor(controller),
+                                ),
+                                _buildEditTool(
+                                  icon: AppImages.imageFilterIcon,
+                                  label: 'Filter',
+                                  onTap: () =>
+                                      _showFilterBottomSheet(controller),
+                                ),
+                                _buildEditTool(
+                                  icon: AppImages.trimIcon,
+                                  label: 'Trim',
+                                  onTap: () =>
+                                      _showTrimmingBottomSheet(controller),
+                                ),
+                              ],
                             ),
                             10.height,
                             SafeArea(
@@ -1310,14 +1289,12 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                 Expanded(
                                   child: InkWell(
                                     onTap: () => controller.backToGallery(),
-                                    child: Container(
-                                      child: Text(
-                                        'Back',
-                                        style: TextStyle(
-                                          color: whiteColor,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                    child: Text(
+                                      'Back',
+                                      style: TextStyle(
+                                        color: whiteColor,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ),
@@ -1394,15 +1371,17 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(
+                  alpha:0.15),
               borderRadius: BorderRadius.circular(8),
               // border: Border.all(
-              //   color: Colors.white.withOpacity(0.3),
+              //   color: Colors.white.withValues(alpha:0.3),
               //   width: 1.5,
               // ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(
+                      alpha:0.2),
                   blurRadius: 8,
                   offset: Offset(0, 2),
                 ),
@@ -1429,8 +1408,8 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
 
   // Show camera options
   void _showCameraOptions(CreateReelsController controller) {
-    Get.dialog(
-      AlertDialog(
+    showDialog(context: context, builder: (context){
+      return  AlertDialog(
         backgroundColor: Colors.grey[900],
         title: Text('Select Option', style: TextStyle(color: whiteColor)),
         content: Column(
@@ -1454,15 +1433,15 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
             ),
           ],
         ),
-      ),
-    );
+      );
+    });
   }
 
   // Step 1: Show audio bottom sheet (from music button)
   void _showMusicBottomSheet(CreateReelsController controller) async {
     // CRITICAL: Track if music was playing before opening bottom sheet
     final wasMusicPlaying = controller.isMusicPlaying.value;
-    final hadMusicSelected = controller.selectedMusicPath.value.isNotEmpty;
+    final _ = controller.selectedMusicPath.value.isNotEmpty;
     
     // CRITICAL: Don't clear music selection - just pause it if playing
     // This preserves the selected music so it can resume if user doesn't change it
@@ -1498,14 +1477,15 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
     controller.selectedMusicImgPath.value = '';
     controller.selectedMusicIndex.value = (-1);
     controller.isNextForTrim.value=false;
-    Get.bottomSheet(
-      MusicSelectionBottomSheet(
+    showModalBottomSheet(
+        isScrollControlled: true,
+        isDismissible: true,
+        enableDrag: true,
+        context: context, builder: (context){
+      return MusicSelectionBottomSheet(
         controller: controller,
-      ),
-      isScrollControlled: true,
-      isDismissible: true,
-      enableDrag: true,
-    ).then((_) async {
+      );
+    }).then((_) async {
       debugPrint(
           'Bottom sheet closed, wasMusicPlaying: $wasMusicPlaying, isMusicAppliedToVideo: ${controller
               .isMusicAppliedToVideo.value}');
@@ -1519,7 +1499,6 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
         controller.isMusicAppliedToVideo.refresh();
         controller.update();
       }
-      print('controller.isNextForTrim.value ======>>> ::${controller.isNextForTrim.value}');
 
       if(!controller.isNextForTrim.value){
         Map<String, dynamic>? data=await TrimmedMusicDB.getStoredTrimmedMusic();
@@ -1543,9 +1522,7 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
         if (controller.isVideo.value &&
             controller.videoController.value != null &&
             controller.videoController.value!.value.isInitialized) {
-          try {
-            print(']]]]]]]]]]]]]]]]]]]]]]');
-            // Re-add auto-play listener
+          try {// Re-add auto-play listener
             controller.videoController.value!.addListener(
               controller.ensureVideoLooping,
             );
@@ -1579,11 +1556,8 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
             // If music is playing separately, mute video; otherwise play with sound
             if (wasMusicPlaying &&
                 controller.selectedMusicPath.value.isNotEmpty) {
-              print('+++++++++>>>>>>>>');
               await controller.videoController.value!.setVolume(0.0);
             } else {
-              print('---------->>>>>>>>');
-
               await controller.videoController.value!.setVolume(1.0);
             }
             await controller.videoController.value!.play();
@@ -1699,20 +1673,28 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
 
   // Show text editor
   void _showTextEditor(CreateReelsController controller) {
-    Get.bottomSheet(
-      TextEditorBottomSheet(controller: controller),
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-    );
+    showModalBottomSheet(
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        context: context, builder: (context){
+      return TextEditorBottomSheet(controller: controller);
+    });
+    // Get.bottomSheet(
+    //   TextEditorBottomSheet(controller: controller),
+    //   isScrollControlled: true,
+    //   backgroundColor: Colors.transparent,
+    // );
   }
 
   // Show filter bottom sheet
   void _showFilterBottomSheet(CreateReelsController controller) {
-    Get.bottomSheet(
-      FilterSelectionBottomSheet(controller: controller),
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-    );
+    showModalBottomSheet(
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        context: context, builder: (context){
+      return FilterSelectionBottomSheet(controller: controller);
+    });
+
   }
 
   // Show trimming bottom sheet
@@ -1727,12 +1709,13 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
       // Continue anyway - thumbnails will be generated in background if not ready
     }
     
-    Get.bottomSheet(
-      VideoTrimmingBottomSheet(controller: controller),
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      isDismissible: true,
-      enableDrag: true,
-    );
+   showModalBottomSheet(
+       isScrollControlled: true,
+         backgroundColor: Colors.transparent,
+         isDismissible: true,
+         enableDrag: true,
+       context: context, builder: (context){
+     return VideoTrimmingBottomSheet(controller: controller);
+   });
   }
 }

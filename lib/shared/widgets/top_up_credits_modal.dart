@@ -89,7 +89,7 @@ class TopUpCreditsModal extends StatelessWidget {
                       selectedAmount: controller.selectedAmount.value,
                       isCustom: false,
                       isSelected: controller.selectedAmount.value == 500 && !controller.isCustomAmount.value,
-                      onTap: () => controller.selectAmount(500),
+                      onTap: () => controller.selectAmount(500), context: context,
                     ),
                     _buildAmountButton(
                       amount: 1000,
@@ -97,6 +97,7 @@ class TopUpCreditsModal extends StatelessWidget {
                       isCustom: false,
                       isSelected: controller.selectedAmount.value == 1000 && !controller.isCustomAmount.value,
                       onTap: () => controller.selectAmount(1000),
+                        context: context
                     ),
                     _buildAmountButton(
                       amount: 2000,
@@ -104,6 +105,7 @@ class TopUpCreditsModal extends StatelessWidget {
                       isCustom: false,
                       isSelected: controller.selectedAmount.value == 2000 && !controller.isCustomAmount.value,
                       onTap: () => controller.selectAmount(2000),
+                        context: context
                     ),
                     _buildAmountButton(
                       amount: 5000,
@@ -111,6 +113,7 @@ class TopUpCreditsModal extends StatelessWidget {
                       isCustom: false,
                       isSelected: controller.selectedAmount.value == 5000 && !controller.isCustomAmount.value,
                       onTap: () => controller.selectAmount(5000),
+                        context: context
                     ),
                     _buildAmountButton(
                       amount: 10000,
@@ -118,6 +121,7 @@ class TopUpCreditsModal extends StatelessWidget {
                       isCustom: false,
                       isSelected: controller.selectedAmount.value == 10000 && !controller.isCustomAmount.value,
                       onTap: () => controller.selectAmount(10000),
+                        context: context
                     ),
                     _buildAmountButton(
                       amount: 0,
@@ -125,6 +129,7 @@ class TopUpCreditsModal extends StatelessWidget {
                       isCustom: true,
                       isSelected: controller.isCustomAmount.value,
                       onTap: () => controller.selectCustomAmount(),
+                        context: context
                     ),
                   ],
                 )),
@@ -256,12 +261,13 @@ class TopUpCreditsModal extends StatelessWidget {
     required bool isCustom,
     required VoidCallback onTap,
     required bool isSelected,
+    required BuildContext context
   }) {
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: (Get.width - 64) / 3 - 8,
+        width: ((MediaQuery.of(context).size.width) - 64) / 3 - 8,
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
         decoration: BoxDecoration(
           color: isSelected ? tealColor : whiteColor,

@@ -9,6 +9,7 @@ class ServiceModel {
   final String address;
   final String workingDays;
   final String workingHours;
+  final String price;
 
   ServiceModel({
     required this.id,
@@ -21,6 +22,7 @@ class ServiceModel {
     required this.address,
     required this.workingDays,
     required this.workingHours,
+    required this.price,
   });
 
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
@@ -35,6 +37,7 @@ class ServiceModel {
       address: json['address'] ?? '',
       workingDays: json['workingDays'] ?? '',
       workingHours: json['workingHours'] ?? '',
+      price: json['price'] ?? '',
     );
   }
 
@@ -50,6 +53,7 @@ class ServiceModel {
       'address': address,
       'workingDays': workingDays,
       'workingHours': workingHours,
+      'price': price,
     };
   }
 }

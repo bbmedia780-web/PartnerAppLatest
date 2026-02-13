@@ -59,8 +59,8 @@ void main() async {
     }
     // In debug mode, print errors for debugging
     if (kDebugMode) {
-      print('Unhandled error: $error');
-      print('Stack trace: $stack');
+      debugPrint('Unhandled error: $error');
+      debugPrint('Stack trace: $stack');
     }
   });
 }
@@ -153,7 +153,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       title: 'Varnika',
       initialBinding: SplashBindings(),
       getPages: AppPages.pages,
-      initialRoute: AppRoutes.dashboard,
+      initialRoute: AppRoutes.splash,
       navigatorKey: Get.key,
     );
   }

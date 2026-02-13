@@ -132,7 +132,7 @@ class _ReelItemWidgetState extends State<ReelItemWidget> with WidgetsBindingObse
   Widget build(BuildContext context) {
     final hasVideo = controller.videoControllers.containsKey(widget.index);
     final isInitialized = controller.isInitialized[widget.index] ?? false;
-    final isCurrentReel = controller.currentIndex.value == widget.index;
+    // final isCurrentReel = controller.currentIndex.value == widget.index;
     
     // CRITICAL: Check visibility when building
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -172,8 +172,8 @@ class _ReelItemWidgetState extends State<ReelItemWidget> with WidgetsBindingObse
                 end: Alignment.bottomCenter,
                 colors: [
                   Colors.transparent,
-                  Colors.black.withOpacity(0.3),
-                  Colors.black.withOpacity(0.7),
+                  Colors.black.withValues(alpha:0.3),
+                  Colors.black.withValues(alpha:0.7),
                 ],
                 stops: const [0.0, 0.6, 1.0],
               ),
@@ -226,7 +226,7 @@ class _ReelItemWidgetState extends State<ReelItemWidget> with WidgetsBindingObse
                         widget.reel['description'] as String,
                         style: AppTextStyles.regular.copyWith(
                           fontSize: 14,
-                          color: whiteColor.withOpacity(0.9),
+                          color: whiteColor.withValues(alpha:0.9),
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -246,7 +246,7 @@ class _ReelItemWidgetState extends State<ReelItemWidget> with WidgetsBindingObse
                             widget.reel['audio'] as String,
                             style: AppTextStyles.light.copyWith(
                               fontSize: 12,
-                              color: whiteColor.withOpacity(0.8),
+                              color: whiteColor.withValues(alpha:0.8),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -327,7 +327,7 @@ class _ReelItemWidgetState extends State<ReelItemWidget> with WidgetsBindingObse
                 return Container(
                   height: 2,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
+                    color: Colors.white.withValues(alpha:0.3),
                   ),
                   child: FractionallySizedBox(
                     alignment: Alignment.centerLeft,
@@ -345,61 +345,6 @@ class _ReelItemWidgetState extends State<ReelItemWidget> with WidgetsBindingObse
     );
   }
 
-  Widget _buildPlaceholder() {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Image.asset(
-          widget.reel['thumbnail'] as String,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              color: kColorGray,
-              child: const Center(
-                child: Icon(Icons.video_library, color: Colors.white54, size: 64),
-              ),
-            );
-          },
-        ),
-        Container(
-          color: Colors.black.withOpacity(0.2),
-          child: const Center(
-            child: Icon(
-              Icons.play_circle_outline,
-              color: Colors.white70,
-              size: 64,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLoadingPlaceholder() {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Image.asset(
-          widget.reel['thumbnail'] as String,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              color: kColorGray,
-            );
-          },
-        ),
-        Container(
-          color: Colors.black.withOpacity(0.4),
-          child: const Center(
-            child: CircularProgressIndicator(
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildActionButton({
     required IconData icon,
     required String label,
@@ -413,7 +358,7 @@ class _ReelItemWidgetState extends State<ReelItemWidget> with WidgetsBindingObse
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha:0.3),
               shape: BoxShape.circle,
             ),
             child: Icon(

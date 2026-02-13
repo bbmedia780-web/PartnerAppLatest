@@ -302,33 +302,31 @@ class WalletScreen extends StatelessWidget {
       onTap: onTap,
       child: CustomContainer(
         radius: 12,
-        child: Container(
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 22,
-                ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
               ),
-              8.height,
-              Text(
-                title,
-                style: AppTextStyles.regular.copyWith(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: blackColor,
-                ),
-                textAlign: TextAlign.center,
+              child: Icon(
+                icon,
+                color: color,
+                size: 22,
               ),
-            ],
-          ),
+            ),
+            8.height,
+            Text(
+              title,
+              style: AppTextStyles.regular.copyWith(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: blackColor,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );

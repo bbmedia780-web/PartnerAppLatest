@@ -26,7 +26,7 @@ class _SignInScreenState extends State<SignInScreen> {
           children: [
             // Carousel Section with Overlay - Full Width
             SizedBox(
-              height: height * 0.35,
+              height: (MediaQuery.of(context).size.height) * 0.35,
               width: double.infinity,
               child: Stack(
                 fit: StackFit.expand,
@@ -46,7 +46,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       onPageChanged: (index, reason) {
                         controller.changePageIndex(index);
                       },
-                      height: height * 0.35,
+                      height: (MediaQuery.of(context).size.height) * 0.35,
                       viewportFraction: 1.0,
                       autoPlay: true,
                       autoPlayInterval: const Duration(seconds: 3),
@@ -71,9 +71,9 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                   // Text Layer on Top
                   Positioned(
-                    left: 20,
+                    left: 16,
                     bottom: 20,
-                    right: 20,
+                    right: 16,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -107,7 +107,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               padding: const EdgeInsets.only(right: 4),
                               child: Container(
                                 height: 2,
-                                width: (Get.width - 70 - (controller.lstImgs.length - 1) * 7) / controller.lstImgs.length,
+                                width: ((MediaQuery.of(context).size.width) - 70 - (controller.lstImgs.length - 1) * 7) / controller.lstImgs.length,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(50),
                                   color: controller.pageIndex.value == index
@@ -143,7 +143,7 @@ class _SignInScreenState extends State<SignInScreen> {
           return SizedBox(
             height: 100,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
               child: Column(
                 children: [
                   CustomButton(

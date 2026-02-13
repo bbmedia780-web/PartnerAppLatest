@@ -1,5 +1,3 @@
-import 'package:varnika_app/features/core/screens/booking/models/booking_model.dart';
-
 import '../../../../../../utils/library_utils.dart';
 
 class BookingController extends GetxController {
@@ -162,24 +160,6 @@ class BookingController extends GetxController {
   void callServiceProvider(String phoneNumber) {
     // Implement phone call functionality
     ShowToast.success('Calling $phoneNumber...');
-  }
-
-  String _formatDate(DateTime date) {
-    final months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-    return '${date.day.toString().padLeft(2, '0')} ${months[date.month - 1]}, ${date.year}';
   }
 }
 

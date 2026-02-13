@@ -105,13 +105,34 @@ class ServiceDetailsScreen extends StatelessWidget {
                     ),
                     8.height,
                     // Service Category
-                    Text(
-                      '${service.serviceType} | ${service.serviceName}',
-                      style: AppTextStyles.regular.copyWith(
-                        fontSize: 14,
-                        color: greyDarkLight,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${service.serviceType} | ${service.serviceName}',
+                            style: AppTextStyles.regular.copyWith(
+                              fontSize: 14,
+                              color: greyDarkLight,
+                            ),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Icon(Icons.currency_rupee_outlined,color: appColor,size: 16,weight: 10,),
+                            Text(
+                              service.price,
+                              style: AppTextStyles.subHeading.copyWith(
+                                  fontSize: 16.5,
+                                  color:  appColor,
+                                  fontWeight: FontWeight.bold
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
+
                     20.height,
                     // Location
                     Row(

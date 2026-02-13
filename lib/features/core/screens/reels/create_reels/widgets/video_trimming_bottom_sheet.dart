@@ -206,8 +206,7 @@ class _VideoTrimmingBottomSheetState extends State<VideoTrimmingBottomSheet> {
         }
       } else {
           // CRITICAL: For videos, generate thumbnails at different time positions (silently)
-          debugPrint('🔄 Generating ${thumbnailCount} video thumbnails silently in background...');
-          
+
           // Get actual video duration
           double maxDuration = _maxDuration;
           if (widget.controller.videoController.value != null &&
@@ -271,7 +270,7 @@ class _VideoTrimmingBottomSheetState extends State<VideoTrimmingBottomSheet> {
         setState(() {
           _thumbnails = thumbnails;
         });
-          debugPrint('✅ ${thumbnails.where((t) => t != null).length}/${thumbnailCount} thumbnails loaded silently');
+          debugPrint('✅ ${thumbnails.where((t) => t != null).length}/$thumbnailCount thumbnails loaded silently');
       }
     } catch (e) {
         debugPrint('Error loading thumbnails silently: $e');
@@ -393,7 +392,6 @@ class _VideoTrimmingBottomSheetState extends State<VideoTrimmingBottomSheet> {
       debugPrint('Error in _trimVideo: $e');
       // ShowToast.show(message: 'Error: ${e.toString()}', type: ToastType.error);
     } finally {
-      if (!mounted) return;
       setState(() {
         _isProcessing = false;
       });
@@ -752,7 +750,7 @@ class _VideoTrimmingBottomSheetState extends State<VideoTrimmingBottomSheet> {
       right: false,
       bottom: true,
       child: Container(
-      height: Get.height * 0.6,
+      height: ((MediaQuery.of(context).size.height)) * 0.6,
       decoration: BoxDecoration(
         color: bottomsheetbgcolor,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -886,7 +884,7 @@ class _VideoTrimmingBottomSheetState extends State<VideoTrimmingBottomSheet> {
                                 _calculateHandlePosition(
                                   _startTime,
                                   _maxDuration,
-                                  Get.width - 32,
+                                  (MediaQuery.of(context).size.width) - 32,
                                 ) -
                                 20, // Center the handle on the position
                             top: 0,
@@ -897,7 +895,7 @@ class _VideoTrimmingBottomSheetState extends State<VideoTrimmingBottomSheet> {
                                 debugPrint("Start handle tapped");
                               },
                               onPanUpdate: (details) {
-                                final width = Get.width - 32;
+                                final width = (MediaQuery.of(context).size.width) - 32;
                                 if (width <= 0) return;
 
                                 // Use maxDuration for ratio calculation
@@ -943,7 +941,7 @@ class _VideoTrimmingBottomSheetState extends State<VideoTrimmingBottomSheet> {
                                 _calculateHandlePosition(
                                   _endTime,
                                   _maxDuration,
-                                  Get.width - 32,
+                                  (MediaQuery.of(context).size.width) - 32,
                                 ) -
                                 20, // Center the handle on the position
                             top: 0,
@@ -954,7 +952,7 @@ class _VideoTrimmingBottomSheetState extends State<VideoTrimmingBottomSheet> {
                                 debugPrint("End handle tapped");
                               },
                               onPanUpdate: (details) {
-                                final width = Get.width - 32;
+                                final width = (MediaQuery.of(context).size.width) - 32;
                                 if (width <= 0) return;
 
                                 // Use maxDuration instead of _endTime for ratio calculation
@@ -1004,14 +1002,14 @@ class _VideoTrimmingBottomSheetState extends State<VideoTrimmingBottomSheet> {
                             left: _calculateHandlePosition(
                               _startTime,
                               _maxDuration,
-                              Get.width - 32,
+                              (MediaQuery.of(context).size.width) - 32,
                             ),
                             right:
-                                (Get.width - 32) -
+                                ((MediaQuery.of(context).size.width) - 32) -
                                 _calculateHandlePosition(
                                   _endTime,
                                   _maxDuration,
-                                  Get.width - 32,
+                                  (MediaQuery.of(context).size.width) - 32,
                                 ),
                             top: 0,
                             bottom: 0,
@@ -1021,7 +1019,7 @@ class _VideoTrimmingBottomSheetState extends State<VideoTrimmingBottomSheet> {
                             //   ignoring: true,
                             //   child: Container(
                             //     decoration: BoxDecoration(
-                            //       color: appColor.withOpacity(0.3),
+                            //       color: appColor.withValues(alpha:0.3),
                             //       border: Border.symmetric(
                             //         vertical:
                             //         BorderSide(color: appColor, width: 2),

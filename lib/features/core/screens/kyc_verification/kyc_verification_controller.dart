@@ -120,7 +120,7 @@ class KycVerificationController extends GetxController {
       isAadhaarOtpSent.value = true;
       ShowToast.success('OTP sent to your mobile number');
     } else {
-      print('Error : ${result?['message'].toString()}');
+      // print('Error : ${result?['message'].toString()}');
 
       ShowToast.error(result?['message'] ?? 'Failed to send OTP');
     }
@@ -155,7 +155,7 @@ class KycVerificationController extends GetxController {
         nextStep();
       });
     } else {
-      print('Error: ${result?['message']}');
+      // print('Error: ${result?['message']}');
       ShowToast.error(result?['message'] ?? 'OTP verification failed');
     }
   }
@@ -237,7 +237,6 @@ class KycVerificationController extends GetxController {
 
     isVerifyingBank.value = false;
 
-    print("Result ==== $result");
     if (result == null) {
       _clearFailedBankDetails();
       ShowToast.error("Bank verification failed");
@@ -256,7 +255,7 @@ class KycVerificationController extends GetxController {
     }
     final bankName = data['bank_name']?.toString() ?? "NOT_AVAILABLE";
 
-    print("Bank Name :: $bankName");
+    // print("Bank Name :: $bankName");
 
     if (bankName != "NOT_AVAILABLE") {
       // SUCCESS
@@ -272,12 +271,6 @@ class KycVerificationController extends GetxController {
   void _clearFailedBankDetails() {
     verifiedBankDetails.value = {};
     isBankVerified.value = false;
-  }
-  void _onAllVerificationsComplete() {
-    ShowToast.success('All KYC verifications completed!');
-    // Future.delayed(const Duration(seconds: 2), () {
-    //   Get.back();
-    // });
   }
 
   // Check if can proceed to next step

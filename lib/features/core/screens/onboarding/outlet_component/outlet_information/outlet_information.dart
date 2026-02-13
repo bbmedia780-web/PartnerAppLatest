@@ -187,7 +187,7 @@ class OutletInformationView extends GetView<OnBoardingController> {
                                       .contains(day);
 
                                   return SizedBox(
-                                    width: Get.width * 0.27,
+                                    width: (MediaQuery.of(context).size.width) * 0.27,
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
@@ -460,7 +460,7 @@ class OutletInformationView extends GetView<OnBoardingController> {
                                                     padding: EdgeInsets.all(12),
                                                     decoration: BoxDecoration(
                                                       color: appColor
-                                                          .withOpacity(0.1),
+                                                          .withValues(alpha:0.1),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                             8,
@@ -488,7 +488,7 @@ class OutletInformationView extends GetView<OnBoardingController> {
                                                     padding: EdgeInsets.all(8),
                                                     decoration: BoxDecoration(
                                                       color: errorColor
-                                                          .withOpacity(0.1),
+                                                          .withValues(alpha:0.1),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                             8,

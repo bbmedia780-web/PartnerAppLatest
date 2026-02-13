@@ -1,44 +1,26 @@
 import 'dart:io';
-import 'dart:typed_data';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_new/return_code.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:gallery_media_picker/gallery_media_picker.dart';
-import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:varnika_app/constarits/images.dart';
-import 'package:video_player/video_player.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
-import 'package:varnika_app/utils/global.dart';
 import '../screens/save_reel_screen.dart';
-import '../services/trimmed_music_db.dart';
+import '../../../../../../utils/library_utils.dart';
 
 class CreateReelsController extends GetxController {
   final ImagePicker _picker = ImagePicker();
   final AudioPlayer _audioPlayer = AudioPlayer();
-
   final RxInt currentScreen = 0.obs;
-
   final Rx<File?> selectedMedia = Rx<File?>(null);
   final RxBool isVideo = false.obs;
   final Rx<VideoPlayerController?> videoController = Rx<VideoPlayerController?>(null);
   final RxBool isVideoInitialized = false.obs;
-
   final RxList<Map<String, dynamic>> galleryMedia = <Map<String, dynamic>>[].obs;
   final RxBool isLoadingGallery = false.obs;
   final RxInt galleryPickerRefreshKey = 0.obs;
-
   final RxBool isMultipleSelectionMode = false.obs;
   final RxList<int> selectedImageIndices = <int>[].obs;
   final RxList<File> selectedImages = <File>[].obs;
   final RxMap<String, int> selectedImagePositions = <String, int>{}.obs;
   final Rx<File?> selectedVideo = Rx<File?>(null);
   final RxString multiSelectionType = 'none'.obs;
-
   final RxString selectedMusic = ''.obs;
   final RxString selectedMusicArtist = ''.obs;
   final RxString selectedMusicPath = ''.obs;
@@ -46,33 +28,29 @@ class CreateReelsController extends GetxController {
   final RxBool isMusicPlaying = false.obs;
   final RxBool isNextForTrim = false.obs;
   final RxInt currentlyPlayingIndex = (-1).obs;
-  final RxBool isMusicAppliedToVideo = false.obs; // Track if music is applied to video (after trimming Done)
+  final RxBool isMusicAppliedToVideo = false.obs;
   final RxList<Map<String, dynamic>> addedTexts = <Map<String, dynamic>>[].obs;
-  final RxString editingTextId = ''.obs; // Track which text is being edited (to hide it)
+  final RxString editingTextId = ''.obs;
   final RxInt selectedFilterIndex = 0.obs;
-  final RxInt selectedFilterTab = 0.obs; // 0: Aesthetics, 1: Special Effects
+  final RxInt selectedFilterTab = 0.obs;
   final RxDouble videoStartTime = 0.0.obs;
   final RxDouble videoEndTime = 0.0.obs;
   final RxDouble videoDuration = 0.0.obs;
-  final RxDouble musicStartTime = 0.0.obs; // Start time of selected music segment
-  final RxDouble musicEndTime = 60.0.obs; // End time of selected music segment
+  final RxDouble musicStartTime = 0.0.obs;
+  final RxDouble musicEndTime = 60.0.obs;
   RxInt selectedMusicIndex = (-1).obs;
   final RxString selectedFilterName = 'No effect'.obs;
-
   final RxInt selectedMusicTab = 0.obs;
   final RxSet<String> savedMusicSet = <String>{}.obs;
-
   final RxBool isProcessingVideo = false.obs;
   final RxDouble processingProgress = 0.0.obs;
   final Rx<File?> processedVideoFile = Rx<File?>(null);
   Rx<File?> generatedVideo = Rx<File?>(null);
-  final Rx<File?> finalizedVideo = Rx<File?>(null); // Final video with all edits
-
+  final Rx<File?> finalizedVideo = Rx<File?>(null);
   final RxBool isMusicSelectionActive = false.obs;
-  
   final RxList<Uint8List?> preloadedThumbnails = <Uint8List?>[].obs;
   final RxBool isLoadingThumbnails = false.obs;
-  final RxString thumbnailMediaPath = ''.obs; // Track which media path thumbnails are for
+  final RxString thumbnailMediaPath = ''.obs;
   double? lockedAspectRatio;
 
   final RxList<Map<String, dynamic>> musicList = <Map<String, dynamic>>[
@@ -317,7 +295,7 @@ class CreateReelsController extends GetxController {
         return; // GalleryMediaPicker will handle permissions
       }
 
-      if (ps == null || !ps.isAuth) {
+      if (!ps.isAuth) {
         // Permission not granted - GalleryMediaPicker will request it
         isLoadingGallery.value = false;
         return;
@@ -389,7 +367,7 @@ class CreateReelsController extends GetxController {
         debugPrint('Permission check failed: $e');
         return;
       }
-      if (ps != null && ps.isAuth) {
+      if (ps.isAuth) {
          _loadGalleryMediaInBackground();
         galleryPickerRefreshKey.value++;
       }
@@ -454,7 +432,6 @@ class CreateReelsController extends GetxController {
 
   Future<void> handleSelectedMediaFromPicker(List<PickedAssetModel> mediaList) async {
     try {
-      print('isMultipleSelectionMode.value :: ${isMultipleSelectionMode.value}');
       if (isMultipleSelectionMode.value) {
         if (mediaList.isEmpty) {
           selectedImages.clear();
@@ -824,7 +801,6 @@ class CreateReelsController extends GetxController {
       final outputPath = '${tempDir.path}/slideshow_video_${DateTime.now().millisecondsSinceEpoch}.mp4';
       
       const double durationPerImage = 2.0;
-      final totalDuration = selectedImages.length * durationPerImage;
 
       List<File> tempImages = [];
       for (int i = 0; i < selectedImages.length; i++) {
@@ -1124,6 +1100,8 @@ class CreateReelsController extends GetxController {
         debugPrint('Camera image selected: ${selectedMedia.value?.path}');
       }
     } catch (e) {
+      debugPrint('e: ${e.toString()}');
+
     }
   }
 
@@ -1300,7 +1278,7 @@ class CreateReelsController extends GetxController {
           maxDuration = videoDuration.value;
         }
         
-        debugPrint('🔄 Preloading ${thumbnailCount} thumbnails in background for: ${mediaFile.path}, duration: ${maxDuration}s');
+        debugPrint('🔄 Preloading $thumbnailCount thumbnails in background for: ${mediaFile.path}, duration: ${maxDuration}s');
         
         for (int i = 0; i < thumbnailCount; i++) {
           try {
@@ -1317,7 +1295,7 @@ class CreateReelsController extends GetxController {
             );
             
             thumbnails.add(thumbnailData);
-            debugPrint('✅ Generated thumbnail $i/${thumbnailCount} at ${clampedTimeMs}ms');
+            debugPrint('✅ Generated thumbnail $i/$thumbnailCount at ${clampedTimeMs}ms');
           } catch (e) {
             debugPrint('Error generating video thumbnail $i: $e');
             thumbnails.add(null);
@@ -1327,7 +1305,7 @@ class CreateReelsController extends GetxController {
           preloadedThumbnails.value = thumbnails;
           isLoadingThumbnails.value = false;
           final successCount = thumbnails.where((t) => t != null).length;
-          debugPrint('✅ $successCount/${thumbnailCount} thumbnails preloaded successfully');
+          debugPrint('✅ $successCount/$thumbnailCount thumbnails preloaded successfully');
           
           // Force UI update
           update();
@@ -1409,7 +1387,7 @@ class CreateReelsController extends GetxController {
         maxDuration = videoDuration.value;
       }
       
-      debugPrint('🔄 Generating ${thumbnailCount} thumbnails synchronously, duration: ${maxDuration}s');
+      debugPrint('🔄 Generating $thumbnailCount thumbnails synchronously, duration: ${maxDuration}s');
       
       // Generate thumbnails sequentially
       for (int i = 0; i < thumbnailCount; i++) {
@@ -1427,7 +1405,7 @@ class CreateReelsController extends GetxController {
           );
           
           thumbnails.add(thumbnailData);
-          debugPrint('✅ Generated thumbnail $i/${thumbnailCount}');
+          debugPrint('✅ Generated thumbnail $i/$thumbnailCount');
         } catch (e) {
           debugPrint('Error generating thumbnail $i: $e');
           thumbnails.add(null);
@@ -1438,7 +1416,7 @@ class CreateReelsController extends GetxController {
       preloadedThumbnails.value = thumbnails;
       isLoadingThumbnails.value = false;
       final successCount = thumbnails.where((t) => t != null).length;
-      debugPrint('✅ $successCount/${thumbnailCount} thumbnails generated synchronously');
+      debugPrint('✅ $successCount/$thumbnailCount thumbnails generated synchronously');
       
       update();
     } catch (e) {
@@ -2778,8 +2756,7 @@ class CreateReelsController extends GetxController {
     final filters = tabIndex == 0 ? aestheticsFilters : specialEffectsFilters;
     final filter = filters[index];
     final filterName = filter['name'] as String;
-    final filterType = filter['filter'] as String;
-    
+
     selectedFilterName.value = filterName;
     
     // ShowToast.show(message: 'Filter applied: $filterName', type: ToastType.success);
@@ -2944,7 +2921,7 @@ class CreateReelsController extends GetxController {
   }
   
   // Create finalized video with all edits (trim, text, filters, music)
-  Future<File?> createFinalizedVideo() async {
+  Future<File?> createFinalizedVideo(BuildContext context) async {
     if (selectedMedia.value == null) {
       // ShowToast.error('Please select media first');
       return null;
@@ -3047,24 +3024,24 @@ class CreateReelsController extends GetxController {
               .replaceAll('\n', '\\n');
           
           // Convert color to hex (format: 0xRRGGBB)
-          int r = color.red;
-          int g = color.green;
-          int b = color.blue;
+          int r = color.r.round();
+          int g = color.g.round();
+          int b = color.b.round();
           String colorHex = '0x${r.toRadixString(16).padLeft(2, '0')}${g.toRadixString(16).padLeft(2, '0')}${b.toRadixString(16).padLeft(2, '0')}';
           
           // Calculate position relative to video dimensions
           // Position is stored relative to screen, need to scale to video dimensions
-          double xRatio = position.dx / Get.width;
-          double yRatio = position.dy / Get.height;
+          double xRatio = position.dx / (MediaQuery.of(context).size.width);
+          double yRatio = position.dy / (MediaQuery.of(context).size.height);
           int x = (xRatio * videoWidth).toInt().clamp(0, videoWidth);
           int y = (yRatio * videoHeight).toInt().clamp(0, videoHeight);
           
           // Build text box if background color is set
           String boxParams = '';
           if (backgroundColor != null) {
-            int bgR = backgroundColor.red;
-            int bgG = backgroundColor.green;
-            int bgB = backgroundColor.blue;
+            int bgR = backgroundColor.r.round();
+            int bgG = backgroundColor.g.round();
+            int bgB = backgroundColor.b.round();
             String bgColorHex = '0x${bgR.toRadixString(16).padLeft(2, '0')}${bgG.toRadixString(16).padLeft(2, '0')}${bgB.toRadixString(16).padLeft(2, '0')}';
             boxParams = ':box=1:boxcolor=$bgColorHex@0.8:boxborderw=5';
           }
@@ -3089,16 +3066,16 @@ class CreateReelsController extends GetxController {
       }
       
       // 4. Handle audio
-      String audioCommand = '';
+      // String audioCommand = '';
       if (selectedMusicPath.value.isNotEmpty) {
         // Copy audio asset to temp
         String audioAssetPath = selectedMusicPath.value;
         String audioPath = await _copyAssetToTemp(audioAssetPath);
         audioInputs.add('-i "$audioPath"');
-        audioCommand = '-map 0:v:0 -map 1:a:0 -c:a aac -b:a 128k -ar 44100 -ac 2 -shortest';
+        // audioCommand = '-map 0:v:0 -map 1:a:0 -c:a aac -b:a 128k -ar 44100 -ac 2 -shortest';
       } else {
         // Keep original audio
-        audioCommand = '-c:a copy';
+        // audioCommand = '-c:a copy';
       }
       
       // 5. Build final FFmpeg command
@@ -3107,9 +3084,9 @@ class CreateReelsController extends GetxController {
       String command = '-y '
           '-ss ${startTime.toStringAsFixed(3)} '
           '-i "$videoInput" '
-          '${audioInputs.isNotEmpty ? audioInputs.join(' ') + ' ' : ''}'
+          '${audioInputs.isNotEmpty ? '${audioInputs.join(' ')} ' : ''}'
           '-t ${duration.toStringAsFixed(3)} '
-          '${filterComplex.isNotEmpty ? filterComplex + ' ' : ''}'
+          '${filterComplex.isNotEmpty ? '$filterComplex ' : ''}'
           '-c:v libx264 '
           '-preset veryfast '
           '-crf 23 '
@@ -3261,7 +3238,7 @@ class CreateReelsController extends GetxController {
   }
   
   // Save finalized reel - creates finalized video and saves it
-  Future<void> saveFinalizedReel() async {
+  Future<void> saveFinalizedReel(BuildContext context) async {
     if (selectedMedia.value == null) {
       // ShowToast.error('Please select media first');
       return;
@@ -3273,7 +3250,7 @@ class CreateReelsController extends GetxController {
       
       // Create finalized video with all edits
       // ShowToast.show(message: 'Finalizing video...', type: ToastType.info);
-      final finalized = await createFinalizedVideo();
+      final finalized = await createFinalizedVideo(context);
       if (finalized == null) {
         // ShowToast.error('Failed to create finalized video');
         return;

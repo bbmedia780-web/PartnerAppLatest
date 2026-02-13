@@ -24,7 +24,7 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
   bool _isBold = false;
   bool _isItalic = false;
   bool _hasUnderline = false;
-  bool _hasStrikethrough = false;
+  final bool _hasStrikethrough = false;
   TextAlign _textAlign = TextAlign.center;
   Color? _backgroundColor; // Track background color
   String? _editingTextId;
@@ -111,8 +111,8 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
       right: false,
       bottom: true,
       child: Container(
-        height: Get.height,
-        width: Get.width,
+        height: ((MediaQuery.of(context).size.height)),
+        width: (MediaQuery.of(context).size.width),
         decoration: BoxDecoration(
           color: Colors.black.withValues(alpha: 0.4),
         ),
@@ -127,7 +127,7 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
             child: Center(
               child: Container(
                 constraints: BoxConstraints(
-                  maxWidth: Get.width - 40,
+                  maxWidth: (MediaQuery.of(context).size.width) - 40,
                   minWidth: 50,
                 ),
                 decoration: BoxDecoration(
@@ -197,17 +197,86 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
                 //     fontSize: 18,
                 //   ),
                 // ),
-                TextButton(
-                      onPressed: _handleDone,
-                      child: Text(
-                        'Done',
-                        style: TextStyle(
-                    color: whiteColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: CustomButton(
+                        onTap: (){
+                          debugPrint('==============>>>${_textController.text} ');
+                          if (_textController.text.isNotEmpty) {
+                            if (_editingTextId != null) {
+                              // Update existing text
+                              final index = widget.controller.addedTexts.indexWhere(
+                                    (t) => t['id'] == _editingTextId,
+                              );
+                              if (index != -1) {
+                                // Update text content first
+                                widget.controller.addedTexts[index]['text'] = _textController.text;
+
+                                // Update all style properties
+                                widget.controller.updateTextStyle(
+                                  _editingTextId!,
+                                  isBold: _isBold,
+                                  isItalic: _isItalic,
+                                  hasUnderline: _hasUnderline,
+                                  color: _selectedColor,
+                                  fontSize: _fontSize,
+                                  fontStyle: _selectedFontStyle,
+                                  textAlign: _textAlign,
+                                  backgroundColor: _backgroundColor,
+                                );
+
+                                // Ensure background color is updated
+                                widget.controller.addedTexts[index]['backgroundColor'] = _backgroundColor;
+
+                                // Refresh the list to update UI
+                                widget.controller.addedTexts.refresh();
+
+                                // Clear editing ID BEFORE closing so text reappears immediately
+                                widget.controller.editingTextId.value = '';
+
+                                // Force controller update
+                                widget.controller.update();
+                              }
+                            } else {
+                              // Add new text
+                              final textWidth = _textController.text.length * _fontSize * 0.6;
+                              final centerX = (Get.width - textWidth) / 2;
+                              final centerY = Get.height / 3;
+
+                              widget.controller.addText(
+                                _textController.text,
+                                _selectedColor,
+                                _fontSize,
+                                Offset(centerX.clamp(0.0, Get.width - 100), centerY),
+                                fontStyle: _selectedFontStyle,
+                                isBold: _isBold,
+                                isItalic: _isItalic,
+                                hasUnderline: _hasUnderline,
+                                textAlign: _textAlign,
+                                backgroundColor: _backgroundColor,
+                              );
+                            }
+                            Get.back();
+                          } else {
+                            ShowToast.show(
+                              message: 'Please enter some text',
+                              type: ToastType.error,
+                            );
+                          }
+                        },
+                    title: 'Done',
+                    isDisable: false,
+                    bgColor: Colors.transparent,
+                      //   child: Text(
+                      //     'Done',
+                      //     style: TextStyle(
+                      // color: whiteColor,
+                      //       fontSize: 16,
+                      //       fontWeight: FontWeight.bold,
+                      //     ),
+                      //   ),
                       ),
-                    ),
+                ),
                   ],
                 ),
               ),
@@ -344,7 +413,6 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
       height: 40,
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        // color: bottomsheetbgcolor,
       ),
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
@@ -394,7 +462,6 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
       height: 40,
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        // color: bottomsheetbgcolor,
       ),
             child: Row(
               children: [
@@ -451,7 +518,6 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
       height: 40,
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        // color: bottomsheetbgcolor,
       ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -510,7 +576,7 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
       height: 40,
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        // color: Colors.grey[800]?.withOpacity(0.95),
+        // color: Colors.grey[800]?.withValues(alpha:0.95),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -676,134 +742,7 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
     );
   }
   
-  Widget _buildTextSizeSlider() {
-    // Calculate slider value from font size (12-48 range maps to 0-1)
-    // Inverted: 0 is top (max size), 1 is bottom (min size)
-    final double sliderValue = 1.0 - ((_fontSize - 12.0) / (48.0 - 12.0)).clamp(0.0, 1.0);
-    
-    return Container(
-      width: 50,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Plus button at top
-          // GestureDetector(
-          //   onTap: () {
-          //     setState(() {
-          //       _fontSize = (_fontSize + 2).clamp(12.0, 48.0);
-          //     });
-          //   },
-          //   child: Container(
-          //     width: 36,
-          //     height: 36,
-          //     decoration: BoxDecoration(
-          //       color: Colors.white.withOpacity(0.2),
-          //       shape: BoxShape.circle,
-          //       border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
-          //     ),
-          //     child: Icon(
-          //       Icons.add,
-          //       color: whiteColor,
-          //       size: 20,
-          //     ),
-          //   ),
-          // ),
-          
-          SizedBox(height: 16),
-          
-          // Vertical slider track
-          Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final trackHeight = constraints.maxHeight;
-                final handlePosition = sliderValue * trackHeight;
-                
-                return GestureDetector(
-                  onPanUpdate: (details) {
-                    final localPosition = details.localPosition;
-                    final relativeY = localPosition.dy.clamp(0.0, trackHeight);
-                    final newValue = relativeY / trackHeight; // 0 is top (max), 1 is bottom (min)
-                    setState(() {
-                      _fontSize = (12.0 + ((1.0 - newValue) * (48.0 - 12.0))).clamp(12.0, 48.0);
-                    });
-                  },
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Slider track background
-                      Container(
-                        width: 4,
-                        height: trackHeight,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                      // Slider handle
-                      Positioned(
-                        top: handlePosition - 16,
-                        child: Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: whiteColor,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
-                                blurRadius: 4,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Container(
-                              width: 15,
-                              height: 15,
-                              decoration: BoxDecoration(
-                                color: whiteColor,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-          
-          SizedBox(height: 16),
-          
-          // Minus button at bottom
-          // GestureDetector(
-          //   onTap: () {
-          //     setState(() {
-          //       _fontSize = (_fontSize - 2).clamp(12.0, 48.0);
-          //     });
-          //   },
-          //   child: Container(
-          //     width: 36,
-          //     height: 36,
-          //     decoration: BoxDecoration(
-          //       color: Colors.white.withOpacity(0.2),
-          //       shape: BoxShape.circle,
-          //       border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
-          //     ),
-          //     child: Icon(
-          //       Icons.remove,
-          //       color: whiteColor,
-          //       size: 20,
-          //     ),
-          //   ),
-          // ),
-        ],
-      ),
-    );
-  }
-  
+
   Widget _buildToolbarIcon({
     String? imagePath,
     IconData? icon,
@@ -811,9 +750,7 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
     required bool isSelected,
     required VoidCallback onTap,
     bool isColor=true,
-    Widget? child,
   }) {
-    print('imagePath :${imagePath}');
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -885,7 +822,7 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
       ),
     );
   }
-  
+
   void _handleDone() {
     if (_textController.text.isNotEmpty) {
       if (_editingTextId != null) {
@@ -896,7 +833,7 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
         if (index != -1) {
           // Update text content first
           widget.controller.addedTexts[index]['text'] = _textController.text;
-          
+
           // Update all style properties
           widget.controller.updateTextStyle(
             _editingTextId!,
@@ -909,16 +846,16 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
             textAlign: _textAlign,
             backgroundColor: _backgroundColor,
           );
-          
+
           // Ensure background color is updated
           widget.controller.addedTexts[index]['backgroundColor'] = _backgroundColor;
-          
+
           // Refresh the list to update UI
           widget.controller.addedTexts.refresh();
-          
+
           // Clear editing ID BEFORE closing so text reappears immediately
           widget.controller.editingTextId.value = '';
-          
+
           // Force controller update
           widget.controller.update();
         }
@@ -927,7 +864,7 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
         final textWidth = _textController.text.length * _fontSize * 0.6;
         final centerX = (Get.width - textWidth) / 2;
         final centerY = Get.height / 3;
-        
+
         widget.controller.addText(
           _textController.text,
           _selectedColor,

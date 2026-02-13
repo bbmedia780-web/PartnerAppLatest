@@ -529,7 +529,7 @@ class ReelsController extends GetxController {
         reels.refresh();
       }
     } catch (e) {
-      print('Error navigating to comments: $e');
+      debugPrint('Error navigating to comments: $e');
       ShowToast.error('Failed to open comments');
     }
   }
@@ -551,7 +551,7 @@ class ReelsController extends GetxController {
       
       ShowToast.success('Shared successfully!');
     } catch (e) {
-      print('Error sharing reel: $e');
+      debugPrint('Error sharing reel: $e');
       ShowToast.error('Failed to share');
     }
   }

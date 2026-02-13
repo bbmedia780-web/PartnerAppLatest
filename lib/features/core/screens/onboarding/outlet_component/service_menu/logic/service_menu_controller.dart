@@ -35,21 +35,31 @@ class ServiceMenuController extends GetxController{
       CategoryModel(
         title: "Body Care",
         services: [
-          ServiceModel(name: "Body Massage", status: "Active", isSelected: false.obs, images: [AppImages.img1,AppImages.img2,AppImages.img3,]),
-          ServiceModel(name: "Body Polishing", status: "Inactive", isSelected: false.obs, images: [AppImages.img2,AppImages.img1,AppImages.img3,]),
-          ServiceModel(name: "Body Scrub", status: "Active", isSelected: false.obs, images: []),
+          ServiceModel(name: "Body Massage", description:"This is new for user",status: "Active", isSelected: false.obs, images: [AppImages.img1,AppImages.img2,AppImages.img3],price: '100', category: 'Body Care'),
+          ServiceModel(name: "Body Polishing", description:"This is new for user",status: "Inactive", isSelected: false.obs, images: [AppImages.img2,AppImages.img1,AppImages.img3,],price: '250',category: 'Body Care'),
+          ServiceModel(name: "Body Scrub", description:"This is new for user",status: "Active", isSelected: false.obs, images: [],price: '150',category: 'Body Care'),
         ],
       ),
       CategoryModel(
         title: "Facial",
         services: [
-          ServiceModel(name: "Fruit Facial", status: "Active", isSelected: false.obs, images: [AppImages.img2,AppImages.img1,AppImages.img3,]),
-          ServiceModel(name: "Skin Whitening", status: "Inactive", isSelected: false.obs, images: [AppImages.img1,AppImages.img2,AppImages.img3,]),
+          ServiceModel(name: "Fruit Facial", status: "Active", isSelected: false.obs, images: [AppImages.img2,AppImages.img1,AppImages.img3,],price: '270',category: 'Facial',description:"This is new for user"),
+          ServiceModel(name: "Skin Whitening", status: "Inactive", isSelected: false.obs, images: [AppImages.img1,AppImages.img2,AppImages.img3,],price: '300',category: 'Facial',description:"This is new for user"),
         ],
       ),
     ];
   }
+  void addExistingImage(String path) {
+    // selectedImages.add(ImageModel.fromNetwork(path));
+  }
 
+  void showImagePickerDialog() {
+    // same dialog you already wrote
+  }
+
+  List<String> getFinalImages() {
+    return selectedImages.map((e) => e.path).toList();
+  }
   /// HANDLE INDIVIDUAL CHECKBOX
   toggleService(CategoryModel category, ServiceModel service) {
     service.isSelected.value = !service.isSelected.value;
@@ -80,9 +90,9 @@ class ServiceMenuController extends GetxController{
     selectedImage.value = await ImagePickerHelper.showPickerDialog(Get.context!) ?? File("");
 
     if (selectedImage.value.path.isNotEmpty) {
-      print("Image Path: ${selectedImage.value.path}");
+      debugPrint("Image Path: ${selectedImage.value.path}");
     } else {
-      print("No image selected");
+      debugPrint("No image selected");
     }
   }
 
@@ -93,10 +103,10 @@ class ServiceMenuController extends GetxController{
       if (pickedImages.isNotEmpty) {
         selectedImages.addAll(pickedImages);
         selectedImages.refresh();
-        print("Added ${pickedImages.length} images. Total: ${selectedImages.length}");
+        debugPrint("Added ${pickedImages.length} images. Total: ${selectedImages.length}");
       }
     } catch (e) {
-      print("Error picking multiple images: $e");
+      debugPrint("Error picking multiple images: $e");
     }
   }
 
@@ -107,11 +117,11 @@ class ServiceMenuController extends GetxController{
       if (pickedImage != null && pickedImage.path.isNotEmpty) {
         selectedImages.add(pickedImage);
         selectedImages.refresh();
-        print("Added image: ${pickedImage.path}");
-        print("Total images: ${selectedImages.length}");
+        debugPrint("Added image: ${pickedImage.path}");
+        debugPrint("Total images: ${selectedImages.length}");
       }
     } catch (e) {
-      print("Error picking single image: $e");
+      debugPrint("Error picking single image: $e");
     }
   }
 
@@ -155,7 +165,7 @@ class ServiceMenuController extends GetxController{
         }
       }
     } catch (e) {
-      print("Error picking image for service: $e");
+      debugPrint("Error picking image for service: $e");
     }
   }
 
@@ -174,7 +184,7 @@ class ServiceMenuController extends GetxController{
         }
       }
     } catch (e) {
-      print("Error picking multiple images for service: $e");
+      debugPrint("Error picking multiple images for service: $e");
     }
   }
 
@@ -216,11 +226,18 @@ class ServiceModel {
   String status;
   RxBool isSelected;
   List<String> images;
+  String price;
+  String description;
+  String category;
 
   ServiceModel({
     required this.name,
     required this.status,
     required this.isSelected,
     required this.images,
+    required this.price,
+    required this.description,
+    required this.category
+
   });
 }

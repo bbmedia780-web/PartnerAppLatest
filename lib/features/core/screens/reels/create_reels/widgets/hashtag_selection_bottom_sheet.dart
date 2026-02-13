@@ -98,13 +98,13 @@ class _HashtagSelectionBottomSheetState extends State<HashtagSelectionBottomShee
     // Compact overlay mode - 400 height box
     return Container(
       height: 400,
-      width: Get.width - 32, // Account for left/right padding
+      width: (MediaQuery.of(context).size.width) - 32, // Account for left/right padding
       decoration: BoxDecoration(
         color: Colors.grey[900],
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha:0.3),
             blurRadius: 10,
             offset: Offset(0, -2),
           ),

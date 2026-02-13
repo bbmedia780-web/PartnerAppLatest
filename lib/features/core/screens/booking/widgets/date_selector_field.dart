@@ -23,7 +23,7 @@ class DateSelectorField extends StatelessWidget {
              padding: const EdgeInsets.only(left: 15,top: 8,bottom: 8,right: 8),
              child: Text(selectedDate,style: AppTextStyles.subHeading.copyWith(fontSize: 12,color: kColorGray),),
            ),
-           Container(color: appColor.withOpacity(0.1),child: Padding(
+           Container(color: appColor.withValues(alpha:0.1),child: Padding(
              padding: const EdgeInsets.all(8.0),
              child: SizedBox(
                  height: 25,

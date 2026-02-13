@@ -12,8 +12,8 @@ class OnBoardingScreen extends GetView<OnBoardingController> {
           Stack(
             children: [
               Container(
-                height: height * 0.38,
-                width: width,
+                height: (MediaQuery.of(context).size.height) * 0.38,
+                width: (MediaQuery.of(context).size.width),
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage(AppImages.img4),
@@ -73,7 +73,7 @@ class OnBoardingScreen extends GetView<OnBoardingController> {
               Positioned(
                 bottom: 0,
                 child: Container(
-                  width: Get.width,
+                  width: (MediaQuery.of(context).size.width),
                   height: 15,
                   decoration: BoxDecoration(
                     color: whiteColor,
@@ -300,15 +300,15 @@ class OnBoardingScreen extends GetView<OnBoardingController> {
         return true;
       case 2:
         return true;
-        return controller.step1.value;
+        // return controller.step1.value;
       case 3:
       // Step 3 is enabled only if Step 2 is completed
         return true;
-        return controller.step2.value;
+        // return controller.step2.value;
       case 4:
       // Step 4 is enabled only if Step 3 is completed
         return true;
-        return controller.step3.value;
+        // return controller.step3.value;
       default:
         return false;
     }
@@ -319,7 +319,7 @@ class DashedLinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = appColor.withOpacity(0.3)
+      ..color = appColor.withValues(alpha:0.3)
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 

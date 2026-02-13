@@ -154,7 +154,7 @@ class HomeScreen extends StatelessWidget {
                       label: 'Total Revenue',
                       iconPath: AppImages.cardIcon,
                       valueColor: successColor,
-                      iconBackgroundColor: successColor.withOpacity(0.1),
+                      iconBackgroundColor: successColor.withValues(alpha:0.1),
                     ),
                   ),
                 ],

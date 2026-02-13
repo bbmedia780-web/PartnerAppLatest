@@ -1,4 +1,3 @@
-import '../models/booking_model.dart';
 import '../../../../../../utils/library_utils.dart';
 
 class BookingListCard extends StatelessWidget {
@@ -76,7 +75,7 @@ class BookingListCard extends StatelessWidget {
             title: 'Call Now',
             onTap: () => controller.callServiceProvider(''),
             isDisable: false,
-            bgColor: appColor.withOpacity(0.1),
+            bgColor: appColor.withValues(alpha:0.1),
             titleSize: 12,
             titleColor: appColor,
             height: 36,

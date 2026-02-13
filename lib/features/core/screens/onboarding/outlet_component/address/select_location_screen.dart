@@ -164,7 +164,7 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> with Widget
       }
     } catch (e) {
       // If address fetch fails, still initialize map
-      print("Error fetching address for initial location: $e");
+      // print("Error fetching address for initial location: $e");
     }
     
     isMapInitialized.value = true;
@@ -177,7 +177,7 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> with Widget
         await controller.fetchCurrentLocation();
       } catch (e) {
         // If fetching current location fails, use default location
-        print("Error fetching current location: $e");
+        // print("Error fetching current location: $e");
         await _initializeMapWithDefaultLocation();
         return;
       }
@@ -193,7 +193,7 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> with Widget
             controller.longitude.value,
           );
         } catch (e) {
-          print("Error fetching address: $e");
+          debugPrint("Error fetching address: $e");
         }
       }
       

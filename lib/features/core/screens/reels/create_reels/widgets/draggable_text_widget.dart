@@ -21,7 +21,6 @@ class DraggableTextWidget extends StatefulWidget {
 
 class _DraggableTextWidgetState extends State<DraggableTextWidget> {
   Offset? _dragStartPosition; // Position when drag starts
-  Offset? _dragStartLocalPosition; // Local position of touch when drag starts
   double _lastScale = 1.0;
   double _lastRotation = 0.0;
   bool _isDragging = false;
@@ -283,8 +282,9 @@ class _DraggableTextWidgetState extends State<DraggableTextWidget> {
 
           child: Transform.rotate(
             angle: rotation,
-            child: IntrinsicWidth(
-              child: Container(
+            // child: IntrinsicWidth(
+              child:
+              Container(
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: backgroundColor ?? Colors.transparent,
@@ -302,7 +302,7 @@ class _DraggableTextWidgetState extends State<DraggableTextWidget> {
                     hasUnderline: hasUnderline,
                   ),
                 ),
-              ),
+              // ),
             ),
           ),
         ),

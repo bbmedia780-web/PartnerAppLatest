@@ -15,7 +15,7 @@ class MusicSelectionBottomSheet extends StatelessWidget {
       right: false,
       bottom: true,
       child: Container(
-        height: Get.height * 0.5,
+        height: ((MediaQuery.of(context).size.height)) * 0.5,
         decoration: BoxDecoration(
           color: bottomsheetbgcolor,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -181,15 +181,10 @@ class MusicSelectionBottomSheet extends StatelessWidget {
                           final originalIndex = controller.musicList.indexWhere(
                             (m) => m['name'] == musicName,
                           );
-                          final isSelected =
-                              controller.selectedMusicIndex.value ==
-                              originalIndex;
-                          final isSaved = controller.isMusicSaved(musicName);
 
                           return Obx(() {
                             return GestureDetector(
                               onTap: () async {
-                                // Just select music (don't auto-play)
                                 await controller.selectMusic(
                                   music,
                                   originalIndex >= 0 ? originalIndex : index,
@@ -426,10 +421,6 @@ class MusicSelectionBottomSheet extends StatelessWidget {
                                 debugPrint('Error pausing video: $e');
                               }
                             }
-                            print(
-                              'controller.selectedMusic ::${controller.selectedMusic}',
-                            );
-
                             controller.isNextForTrim.value = true;
                             Get.back();
                             // Close music selection sheet
@@ -443,7 +434,6 @@ class MusicSelectionBottomSheet extends StatelessWidget {
                                   enableDrag: true,
                                 )
                                 .then((_) async {
-                                  print('+++++++++++++++++++++==');
                                   // CRITICAL: Add small delay to ensure bottom sheet is fully closed
                                   await Future.delayed(
                                     Duration(milliseconds: 100),

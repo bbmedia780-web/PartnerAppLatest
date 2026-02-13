@@ -106,9 +106,9 @@ class ReferEarnScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(5),
                               border: Border.all(
-                                color: appColor.withOpacity(0.5),
+                                color: appColor.withValues(alpha:0.5),
                               ),
-                              color: appColor.withOpacity(0.05),
+                              color: appColor.withValues(alpha:0.05),
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(4),
@@ -255,15 +255,15 @@ class ReferEarnScreen extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  "₹ "+item['amount'],
+                  "${"₹ "}${item['amount']}",
                   style: AppTextStyles.regular.copyWith(fontSize: 14,color: purpleDarkColor),
                 ),
                 10.width,
-                Container(child: Padding(
+                Container(decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),color: statusColor(item['status'])
+                ),child: Padding(
                   padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
                   child: Text(item['status'],style: AppTextStyles.regular.copyWith(color: whiteColor,fontSize: 10),),
-                ),decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),color: statusColor(item['status'])
                 ),),
               ],
             )

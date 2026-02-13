@@ -111,7 +111,7 @@ class AppPromotionScreen extends StatelessWidget {
                   onTap: controller.closeTopUpModal,
                   behavior: HitTestBehavior.opaque,
                   child: Container(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha:0.5),
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: GestureDetector(
@@ -128,7 +128,7 @@ class AppPromotionScreen extends StatelessWidget {
                   onTap: controller.closeCreateCampaignModal,
                   behavior: HitTestBehavior.opaque,
                   child: Container(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha:0.5),
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: GestureDetector(
@@ -209,7 +209,7 @@ class AppPromotionScreen extends StatelessWidget {
           budget: 'Min.spend: ₹500',
           icon: Container(
             decoration: BoxDecoration(
-              color: successColor.withOpacity(0.2),
+              color: successColor.withValues(alpha:0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child:  Icon(Icons.percent, color: successColor, size: 24),
@@ -232,7 +232,7 @@ class AppPromotionScreen extends StatelessWidget {
           budget: 'Min.spend: ₹2000',
           icon: Container(
             decoration: BoxDecoration(
-              color: successColor.withOpacity(0.2),
+              color: successColor.withValues(alpha:0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child:  Icon(Icons.percent, color: successColor, size: 24),
@@ -254,7 +254,7 @@ class AppPromotionScreen extends StatelessWidget {
           budget: 'Min.spend: ₹2000',
           icon: Container(
             decoration: BoxDecoration(
-              color: successColor.withOpacity(0.2),
+              color: successColor.withValues(alpha:0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child:  Icon(Icons.percent, color: successColor, size: 24),

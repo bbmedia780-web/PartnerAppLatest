@@ -46,13 +46,13 @@ class _FontSizeSliderState
           child: Stack(
             alignment: Alignment.center,
             children: [
-              Container(height: 30,width: 30,),
+              SizedBox(height: 30,width: 30,),
               /// Slider Track
               Container(
                 width: 4,
                 height: trackHeight,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.35),
+                  color: Colors.white.withValues(alpha:0.35),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -68,7 +68,7 @@ class _FontSizeSliderState
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.25),
+                        color: Colors.black.withValues(alpha:0.25),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
