@@ -913,7 +913,7 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                 // CRITICAL: Track if music was playing before opening bottom sheet
                                 final wasMusicPlaying = controller.isMusicPlaying.value;
                                 final hadMusicSelected = controller.selectedMusicPath.value.isNotEmpty;
-                                
+
                                 // Step 5: Pause previous music (only pause, not remove) and open music selection sheet
                                 if (wasMusicPlaying) {
                                   controller
@@ -949,15 +949,13 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                 controller.selectedMusicIndex.value = (-1);
                                 controller.isNextForTrim.value=false;
 
-                                showModalBottomSheet(
-                                    isScrollControlled: true,
+                                Get.bottomSheet(
+                                    MusicSelectionBottomSheet(
+                                      controller: controller,
+                                    ),
                                     isDismissible: true,
                                     enableDrag: true,
-                                    context: context, builder: (context){
-                                  return MusicSelectionBottomSheet(
-                                    controller: controller,
-                                  );
-                                }).then((_) async {
+                                ).then((_) async {
                                   debugPrint('Bottom sheet closed, wasMusicPlaying: $wasMusicPlaying, isMusicAppliedToVideo: ${controller.isMusicAppliedToVideo.value}');
                                   await Future.delayed(const Duration(milliseconds: 150));
 
@@ -969,23 +967,38 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                     controller.isMusicAppliedToVideo.refresh();
                                     controller.update();
                                   }
-                                  if(!controller.isNextForTrim.value){
                                     Map<String, dynamic>? data=await TrimmedMusicDB.getStoredTrimmedMusic();
 
                                     if(data!=null){
-                                      controller.selectedMusic.value=data['musicName'].toString();
-                                      controller.selectedMusicArtist.value=data['musicArtist'].toString();
-                                      controller.selectedMusicImgPath.value=data['musicImagePath'].toString();
-                                      controller.selectedMusicPath.value=data['musicPath'].toString();
-                                      controller.musicStartTime.value=double.tryParse(data['startTime'].toString())??0.0;
-                                      controller.musicEndTime.value=double.tryParse(data['endTime'].toString())??0.0;
+                                      if(!controller.isNextForTrim.value){
+                                        controller.selectedMusic.value=data['musicName'].toString();
+                                        controller.selectedMusicArtist.value=data['musicArtist'].toString();
+                                        controller.selectedMusicImgPath.value=data['musicImagePath'].toString();
+                                        controller.selectedMusicPath.value=data['musicPath'].toString();
+                                        controller.musicStartTime.value=double.tryParse(data['startTime'].toString())??0.0;
+                                        controller.musicEndTime.value=double.tryParse(data['endTime'].toString())??0.0;
+                                      }else{
+                                        controller.selectedMusic.value="";
+                                        controller.selectedMusicArtist.value="";
+                                        controller.selectedMusicImgPath.value="";
+                                        controller.selectedMusicPath.value="";
+                                        controller.musicStartTime.value=0.0;
+                                        controller.musicEndTime.value=0.0;
+                                      }
+                                    }else{
+                                      controller.selectedMusic.value="";
+                                      controller.selectedMusicArtist.value="";
+                                      controller.selectedMusicImgPath.value="";
+                                      controller.selectedMusicPath.value="";
+                                      controller.musicStartTime.value=0.0;
+                                      controller.musicEndTime.value=0.0;
                                     }
-                                  }
+
 
                                   // CRITICAL: Handle two cases:
                                   // 1. Music NOT applied to video: Resume separate audio player
                                   // 2. Music IS applied to video: Resume video (which contains music)
-                                  
+
                                   if (controller.isMusicAppliedToVideo.value) {
                                     // Music is embedded in video - resume video
                                     if (controller.isVideo.value &&
@@ -1021,7 +1034,7 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                         controller.videoController.value!.addListener(
                                           controller.ensureVideoLooping,
                                         );
-                                        
+
                                         // If music is playing separately, mute video; otherwise play with sound
                                         if (wasMusicPlaying && controller.selectedMusicPath.value.isNotEmpty) {
                                           await controller.videoController.value!.setVolume(0.0);
@@ -1039,9 +1052,9 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                 ).catchError((error) {
                                   // CRITICAL: Handle errors and still resume playback if needed
                                   debugPrint('Error in bottom sheet callback: $error');
-                                  
+
                                   controller.isMusicSelectionActive.value = false;
-                                  
+
                                   // CRITICAL: Ensure music state is preserved even on error
                                   if (controller.selectedMusicPath.value.isNotEmpty) {
                                     controller.selectedMusic.refresh();
@@ -1050,7 +1063,7 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                     controller.isMusicAppliedToVideo.refresh();
                                     controller.update();
                                   }
-                                  
+
                                   // Handle based on whether music is applied to video
                                   if (controller.isMusicAppliedToVideo.value) {
                                     // Resume video with embedded music
@@ -1069,9 +1082,9 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
                                     }
                                   } else {
                                     // Resume separate music
-                                    if (hadMusicSelected && 
+                                    if (hadMusicSelected &&
                                         controller.selectedMusicPath.value.isNotEmpty &&
-                                        wasMusicPlaying && 
+                                        wasMusicPlaying &&
                                         !controller.isMusicPlaying.value) {
                                       controller.playSelectedMusic();
                                     }
@@ -1443,7 +1456,7 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
     // CRITICAL: Track if music was playing before opening bottom sheet
     final wasMusicPlaying = controller.isMusicPlaying.value;
     final _ = controller.selectedMusicPath.value.isNotEmpty;
-    
+
     // CRITICAL: Don't clear music selection - just pause it if playing
     // This preserves the selected music so it can resume if user doesn't change it
     if (wasMusicPlaying) {
@@ -1501,17 +1514,31 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
         controller.update();
       }
 
-      if(!controller.isNextForTrim.value){
-        Map<String, dynamic>? data=await TrimmedMusicDB.getStoredTrimmedMusic();
+      Map<String, dynamic>? data=await TrimmedMusicDB.getStoredTrimmedMusic();
 
-        if(data!=null){
+      if(data!=null){
+        if(!controller.isNextForTrim.value){
           controller.selectedMusic.value=data['musicName'].toString();
           controller.selectedMusicArtist.value=data['musicArtist'].toString();
           controller.selectedMusicImgPath.value=data['musicImagePath'].toString();
           controller.selectedMusicPath.value=data['musicPath'].toString();
           controller.musicStartTime.value=double.tryParse(data['startTime'].toString())??0.0;
           controller.musicEndTime.value=double.tryParse(data['endTime'].toString())??0.0;
+        }else{
+          controller.selectedMusic.value="";
+          controller.selectedMusicArtist.value="";
+          controller.selectedMusicImgPath.value="";
+          controller.selectedMusicPath.value="";
+          controller.musicStartTime.value=0.0;
+          controller.musicEndTime.value=0.0;
         }
+      }else{
+        controller.selectedMusic.value="";
+        controller.selectedMusicArtist.value="";
+        controller.selectedMusicImgPath.value="";
+        controller.selectedMusicPath.value="";
+        controller.musicStartTime.value=0.0;
+        controller.musicEndTime.value=0.0;
       }
 
       // CRITICAL: Handle two cases:
@@ -1709,7 +1736,7 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
       debugPrint('Error ensuring thumbnails: $e');
       // Continue anyway - thumbnails will be generated in background if not ready
     }
-    
+
    showModalBottomSheet(
        isScrollControlled: true,
          backgroundColor: Colors.transparent,

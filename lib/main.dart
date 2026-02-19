@@ -1,4 +1,6 @@
 import 'utils/library_utils.dart';
+final RouteObserver<PageRoute> routeObserver =
+RouteObserver<PageRoute>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -106,6 +108,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
+      navigatorObservers: [routeObserver],
       theme: ThemeData(
         useMaterial3: true,
 

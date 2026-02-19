@@ -58,6 +58,7 @@ dependencies:
   ffmpeg_kit_flutter_new: ^4.1.0
   gallery_media_picker: ^0.2.0
   video_thumbnail: ^0.5.6
+  reels_viewer: ^2.0.0
 
 dev_dependencies:
   flutter_test:

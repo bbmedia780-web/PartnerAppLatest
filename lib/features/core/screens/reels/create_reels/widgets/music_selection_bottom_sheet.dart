@@ -453,6 +453,7 @@ class MusicSelectionBottomSheet extends StatelessWidget {
                                   Map<String, dynamic>? data =
                                       await TrimmedMusicDB.getStoredTrimmedMusic();
 
+                                  print('Data =====>: ${data}');
                                   if (data != null) {
                                     controller.selectedMusic.value =
                                         data['musicName'].toString();

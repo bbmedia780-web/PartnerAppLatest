@@ -26,7 +26,9 @@ class DashboardScreen extends StatelessWidget {
     final List<Widget> screens = [
       const HomeScreen(isFromDashboard: true),
       const BookingListScreen(),
-      const ReelsScreen(isFromDashboard: true),
+      ReelsScreen(
+        isActive: controller.currentIndex.value == 2, // 👈 VERY IMPORTANT
+      ),
       const ProfileScreen(),
     ];
 

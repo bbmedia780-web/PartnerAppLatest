@@ -36,11 +36,11 @@ class AppPages {
       page: () => const HomeScreen(),
       binding: HomeBinding(),
     ),
-    GetPage(
-      name: AppRoutes.reels,
-      page: () => const ReelsScreen(),
-      binding: ReelsBinding(),
-    ),
+    // GetPage(
+    //   name: AppRoutes.reels,
+    //   page: () => const ReelsScreen(isActive: ,),
+    //   binding: ReelsBinding(),
+    // ),
     GetPage(
       name: AppRoutes.comments,
       page: () => const CommentsScreen(),
