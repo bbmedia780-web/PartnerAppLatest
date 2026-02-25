@@ -8,7 +8,7 @@ class DashboardController extends GetxController {
     currentIndex.value = index;
     if (Get.isRegistered<ReelsController>()) {
       Get.find<ReelsController>()
-          .updateActivation(index == 3); // 2 = reels tab
+          .updateActivation(index == 2); // 2 = reels tab
     }
   }
 }

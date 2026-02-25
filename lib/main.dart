@@ -1,6 +1,6 @@
 import 'utils/library_utils.dart';
-final RouteObserver<PageRoute> routeObserver =
-RouteObserver<PageRoute>();
+final RouteObserver<ModalRoute<dynamic>> routeObserver =
+RouteObserver<ModalRoute<dynamic>>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
