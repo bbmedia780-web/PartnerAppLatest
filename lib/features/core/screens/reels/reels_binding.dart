@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'reels_controller.dart';
+import 'package:varnika_app/features/core/screens/reels/reels_controller.dart';
 
 class ReelsBinding extends Bindings {
   @override

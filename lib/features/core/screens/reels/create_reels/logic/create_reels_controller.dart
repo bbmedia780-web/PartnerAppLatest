@@ -3301,7 +3301,7 @@ class CreateReelsController extends GetxController {
   }
   
   // Discard changes
-  void discardChanges() async {
+  void discardChanges(BuildContext context) async {
     Get.dialog(
       AlertDialog(
         backgroundColor: Colors.grey[900],

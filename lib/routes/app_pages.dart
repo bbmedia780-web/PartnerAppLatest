@@ -159,7 +159,10 @@ GetPage(
       page: () => const CreateReelsScreen(),
       binding: CreateReelsBinding(),
     ),
-
-
+    GetPage(
+      name: AppRoutes.reelsView,
+      page: () => const ReelsScreen(isActive: true),
+      binding: ReelsBinding(),
+    ),
   ];
 }

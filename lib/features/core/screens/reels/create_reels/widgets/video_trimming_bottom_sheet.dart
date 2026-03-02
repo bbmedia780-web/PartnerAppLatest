@@ -1,8 +1,19 @@
 
+
 import 'dart:io';
+import 'dart:typed_data';
 
-import '../../../../../../utils/library_utils.dart';
-
+import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_new/return_code.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:varnika_app/constarits/int_extensions.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
+import '../../../../../../constarits/colors.dart';
+import '../../../../../../shared/widgets/app_text_style.dart';
+import '../logic/create_reels_controller.dart';
 class VideoTrimmingBottomSheet extends StatefulWidget {
   final CreateReelsController controller;
 
@@ -228,7 +239,7 @@ class _VideoTrimmingBottomSheetState extends State<VideoTrimmingBottomSheet> {
               // OPTIMIZED: Reduced quality and use faster settings for faster thumbnail generation
             final thumbnailData = await VideoThumbnail.thumbnailData(
               video: mediaFile.path,
-              imageFormat: ImageFormat.JPEG,
+              imageFormat:  ImageFormat.JPEG,
                 timeMs: clampedTimeMs,
                 quality: 25, // Further reduced for faster generation
                 maxWidth: 150, // Further reduced for faster processing
@@ -375,7 +386,7 @@ class _VideoTrimmingBottomSheetState extends State<VideoTrimmingBottomSheet> {
       await Future.delayed(Duration(milliseconds: 200));
       widget.controller.update();
 
-      Get.back();
+      Navigator.pop(context);
 
       // Show success message
       // ShowToast.show(

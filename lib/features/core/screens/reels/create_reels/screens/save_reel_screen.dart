@@ -1,5 +1,15 @@
 
-import '../../../../../../utils/library_utils.dart';
+import 'dart:typed_data';
+import 'package:varnika_app/constarits/int_extensions.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import '../../../../../../constarits/colors.dart';
+import '../../../../../../shared/widgets/app_text_style.dart';
+import '../../../../../../shared/widgets/custom_button.dart';
+import '../logic/create_reels_controller.dart';
 import '../widgets/hashtag_selection_bottom_sheet.dart';
 
 class SaveReelScreen extends StatefulWidget {
@@ -525,7 +535,7 @@ class _SaveReelScreenState extends State<SaveReelScreen> {
                 debugPrint('Error resuming video/music: $e');
               }
             }
-            Get.back();
+            Navigator.pop(context);
           },
         ),
         title: Text(
@@ -656,7 +666,7 @@ class _SaveReelScreenState extends State<SaveReelScreen> {
                       maxLines: 3,
                       decoration: InputDecoration(
                         hintText: 'Write a caption and add hashtags...',
-                        hintStyle: AppTextStyles.light.copyWith(color: Color(0xFF676b74),fontSize: 14),
+                        hintStyle: AppTextStyles.regular.copyWith(color: Color(0xFF676b74),fontSize: 14),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.all(16),
                       ),
@@ -689,7 +699,7 @@ class _SaveReelScreenState extends State<SaveReelScreen> {
                               8.width,
                               Text(
                                 'Hashtags',
-                                style: AppTextStyles.light.copyWith(
+                                style: AppTextStyles.subHeading.copyWith(
                                   color: whiteColor,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
@@ -721,6 +731,7 @@ class _SaveReelScreenState extends State<SaveReelScreen> {
                       title: 'Save', isDisable: false,
                     ),
                   ),
+
 
                   // Add bottom padding for safe area
                   SizedBox(height: MediaQuery.of(context).padding.bottom + 20),

@@ -1,5 +1,14 @@
 
-import '../../../../../../utils/library_utils.dart';
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:varnika_app/features/core/screens/reels/create_reels/widgets/text_editor_bottom_sheet.dart';
+
+import '../../../../../../constarits/colors.dart';
+import '../logic/create_reels_controller.dart';
 
 class DraggableTextWidget extends StatefulWidget {
   final Map<String, dynamic> textData;
@@ -333,8 +342,8 @@ class _DraggableTextWidgetState extends State<DraggableTextWidget> {
   }
   
   void _showEditDeleteDialog() {
-    Get.dialog(
-      AlertDialog(
+    showDialog(context: context, builder: (context) {
+      return AlertDialog(
         backgroundColor: Colors.grey[900],
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -351,7 +360,7 @@ class _DraggableTextWidgetState extends State<DraggableTextWidget> {
                 style: TextStyle(color: whiteColor, fontSize: 16),
               ),
               onTap: () {
-                Get.back(); // Close dialog
+                Navigator.pop(context); // Close dialog
                 _openTextEditor(); // Open text editor with pre-filled data
               },
             ),
@@ -365,13 +374,14 @@ class _DraggableTextWidgetState extends State<DraggableTextWidget> {
               ),
               onTap: () {
                 widget.controller.removeText(widget.textData['id'] as String);
-                Get.back(); // Close dialog
+                Navigator.pop(context); // Close dialog
               },
             ),
           ],
         ),
-      ),
-    );
+      )
+      ;
+    });
   }
 }
 

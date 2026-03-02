@@ -31,5 +31,6 @@ class AppRoutes {
   static const wallet = '/wallet';
   static const beauticianList = '/beauticianList';
   static const createReels = '/createReels';
+  static const reelsView = '/reelsView';
 
 }

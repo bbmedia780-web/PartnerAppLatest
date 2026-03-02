@@ -1,4 +1,9 @@
-import '../../../../../../utils/library_utils.dart';
+
+import 'package:flutter/material.dart';
+import 'package:varnika_app/constarits/int_extensions.dart';
+
+import '../../../../../../constarits/colors.dart';
+import '../../../../../../shared/widgets/app_text_style.dart';
 
 class HashtagSelectionBottomSheet extends StatefulWidget {
   final Function(String hashtag) onHashtagSelected;
@@ -121,7 +126,7 @@ class _HashtagSelectionBottomSheetState extends State<HashtagSelectionBottomShee
                 Text(
                   'New reel',
                   style: AppTextStyles.subHeading.copyWith(
-                    color: whiteColor,
+                    color:    whiteColor,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -200,7 +205,7 @@ class _HashtagSelectionBottomSheetState extends State<HashtagSelectionBottomShee
                           8.width,
                           Text(
                             '${_formatCount(count)} public posts',
-                            style: AppTextStyles.light.copyWith(
+                            style: AppTextStyles.subHeading.copyWith(
                               color: Colors.grey[400],
                               fontSize: 14,
                             ),

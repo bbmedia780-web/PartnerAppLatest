@@ -1,5 +1,17 @@
 
-import '../../../../../../utils/library_utils.dart';
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:varnika_app/constarits/int_extensions.dart';
+import '../../../../../../constarits/colors.dart';
+import '../../../../../../constarits/images.dart';
+import '../../../../../../shared/widgets/app_text_style.dart';
+import '../../../../../../shared/widgets/custom_button.dart';
+import '../../../../../../utils/global.dart';
+import '../logic/create_reels_controller.dart';
+import 'font_slider.dart';
 
 class TextEditorBottomSheet extends StatefulWidget {
   final CreateReelsController controller;
@@ -256,7 +268,7 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
                                 backgroundColor: _backgroundColor,
                               );
                             }
-                            Get.back();
+                            Navigator.pop(context);
                           } else {
                             ShowToast.show(
                               message: 'Please enter some text',
@@ -878,7 +890,7 @@ class _TextEditorBottomSheetState extends State<TextEditorBottomSheet> {
           backgroundColor: _backgroundColor,
         );
       }
-      Get.back();
+      Navigator.pop(context);
     } else {
       ShowToast.show(
         message: 'Please enter some text',

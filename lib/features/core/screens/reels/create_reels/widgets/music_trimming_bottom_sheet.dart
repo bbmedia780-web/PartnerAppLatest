@@ -1,4 +1,14 @@
-import '../../../../../../utils/library_utils.dart';
+
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:varnika_app/constarits/int_extensions.dart';
+import '../../../../../../constarits/colors.dart';
+import '../../../../../../constarits/images.dart';
+import '../../../../../../shared/widgets/app_text_style.dart';
+import '../logic/create_reels_controller.dart';
+import '../services/trimmed_music_db.dart';
 
 class MusicTrimmingBottomSheet extends StatefulWidget {
   final CreateReelsController controller;
@@ -497,11 +507,11 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
       widget.controller.update();
 
       // Close the trimming sheet
-      Get.back();
+      Navigator.pop(context);
 
       // Also close the music selection sheet if it's still open
       if (Get.isBottomSheetOpen ?? false) {
-        Get.back();
+        Navigator.pop(context);
       }
 
       // Verify video is ready before applying music
@@ -567,7 +577,7 @@ class _MusicTrimmingBottomSheetState extends State<MusicTrimmingBottomSheet> {
       child: Container(
         height: ((MediaQuery.of(context).size.height)) * 0.92,
         decoration: BoxDecoration(
-          color: transparent,
+          color:transparent,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(

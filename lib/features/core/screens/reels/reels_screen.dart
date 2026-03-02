@@ -302,7 +302,7 @@
 //               if (!hasFirstController || !firstInitialized) {
 //                 // Show a single centered loader until first video is ready
 //                 return Center(
-//                   child: CircularProgressIndicator(color: AppColors.white),
+//                   child: CircularProgressIndicator(color: whiteColor),
 //                 );
 //               }
 //
@@ -331,9 +331,10 @@
 // }
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:reels_viewer/reels_viewer.dart';
+import 'package:varnika_app/features/core/screens/dashboard/dashboard_controller.dart';
 import 'package:varnika_app/features/core/screens/reels/reels_controller.dart';
-import 'package:varnika_app/main.dart';
+import 'package:varnika_app/features/core/screens/reels/reels_view/models/reels_model.dart';
+import 'package:varnika_app/features/core/screens/reels/reels_view/reels_viewer.dart';
 
 class ReelsScreen extends StatefulWidget {
   final bool isActive;
@@ -345,7 +346,7 @@ class ReelsScreen extends StatefulWidget {
 }
 
 class _ReelsScreenState extends State<ReelsScreen> {
-  final ReelsController controller=Get.put(ReelsController());
+ final ReelsController controller=Get.put(ReelsController());
   Key _reelsKey = UniqueKey();
   final List<ReelModel> reelsList = [
     ReelModel(
@@ -378,19 +379,20 @@ class _ReelsScreenState extends State<ReelsScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-
     return Obx(
-            () {
-          print("======>>>>>>${controller.isActiveReels.value}");
-          return ReelsViewer(
-            routeObserver: routeObserver,
-            key: _reelsKey,
-            reelsList: reelsList,
-            showAppbar: false,
-            isActiveScreen:controller.isActiveReels.value,
-          );
-        }
+      () {
+        print("======>>>>>>${controller.isActiveReels.value}");
+        return ReelsViewer(
+          onClickBackArrow: (){
+            final controller = Get.find<DashboardController>();
+            controller.currentIndex.value=0;
+            Navigator.pop(context);
+          },
+          key: _reelsKey,
+          reelsList: reelsList,
+          showAppbar: true,
+        );
+      }
     );
   }
 }
