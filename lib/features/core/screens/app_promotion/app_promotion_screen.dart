@@ -98,7 +98,7 @@ class AppPromotionScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Obx(() => controller.isCouponView.value
-                      ? _buildCouponPromotions(controller)
+                      ? _buildCouponPromotions(controller,context)
                       : _buildAdPromotions(controller)),
                 ),
                10.height,
@@ -193,7 +193,7 @@ class AppPromotionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCouponPromotions(AppPromotionController controller) {
+  Widget _buildCouponPromotions(AppPromotionController controller,BuildContext context) {
     return Column(
       children: [
         PromotionCardWidget(
@@ -216,7 +216,7 @@ class AppPromotionScreen extends StatelessWidget {
           ),
           isCoupon: true,
           onEdit: () => controller.onEditPromotion(0),
-          onDeactivate: () => controller.onDeactivatePromotion(0),
+          onDeactivate: () => controller.onDeactivatePromotion(0,context),
         ),
         10.height,
         PromotionCardWidget(
@@ -239,7 +239,7 @@ class AppPromotionScreen extends StatelessWidget {
           ),
           isCoupon: true,
           onEdit: () => controller.onEditPromotion(1),
-          onDeactivate: () => controller.onDeactivatePromotion(1),
+          onDeactivate: () => controller.onDeactivatePromotion(1,context),
         ),
         PromotionCardWidget(
           title: 'Hair100',
@@ -261,7 +261,7 @@ class AppPromotionScreen extends StatelessWidget {
           ),
           isCoupon: true,
           onEdit: () => controller.onEditPromotion(2),
-          onDeactivate: () => controller.onDeactivatePromotion(2),
+          onDeactivate: () => controller.onDeactivatePromotion(2,context),
         ),
       ],
     );

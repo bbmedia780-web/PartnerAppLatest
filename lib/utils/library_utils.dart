@@ -45,8 +45,6 @@ export 'package:shared_preferences/shared_preferences.dart';
 export 'package:varnika_app/features/core/screens/reels/create_reels/widgets/music_trimming_bottom_sheet.dart';
 export 'package:varnika_app/features/core/screens/reels/create_reels/widgets/font_slider.dart';
 export 'package:varnika_app/utils/global.dart';
-export 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
-export 'package:ffmpeg_kit_flutter_new/return_code.dart';
 export 'package:path_provider/path_provider.dart';
 export 'package:share_plus/share_plus.dart';
 export 'package:varnika_app/features/core/screens/dashboard/dashboard_controller.dart';

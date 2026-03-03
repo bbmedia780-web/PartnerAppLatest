@@ -6,8 +6,8 @@ class ImagePickerHelper {
 
   static Future<File?> showPickerDialog(BuildContext context) async {
     try {
-      return await Get.dialog<File>(
-        AlertDialog(
+      return await showDialog(context: context, builder: (context){
+        return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           title: const Text("Select Image"),
           content: Row(
@@ -70,8 +70,8 @@ class ImagePickerHelper {
               SizedBox.shrink(),
             ],
           ),
-        ),
-      );
+        );
+      });
     } catch (e) {
       return null;
     }

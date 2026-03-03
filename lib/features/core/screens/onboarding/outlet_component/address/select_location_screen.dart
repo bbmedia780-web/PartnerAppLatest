@@ -224,8 +224,8 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> with Widget
 
       if (status.isPermanentlyDenied) {
         // Permission permanently denied, need to open settings
-        final shouldOpen = await Get.dialog<bool>(
-          AlertDialog(
+        final shouldOpen = await showDialog(context: context, builder: (context){
+          return AlertDialog(
             title: const Text('Location Permission Required'),
             content: const Text(
               'Location permission is permanently denied. Please enable it from device settings.',
@@ -240,8 +240,8 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> with Widget
                 child: const Text('Open Settings'),
               ),
             ],
-          ),
-        );
+          );
+        });
 
         if (shouldOpen == true) {
           await openAppSettings();
@@ -278,8 +278,8 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> with Widget
       } else if (status.isDenied) {
         ShowToast.error('Location permission is required to get your current location');
       } else if (status.isPermanentlyDenied) {
-        final shouldOpen = await Get.dialog<bool>(
-          AlertDialog(
+        final shouldOpen = await showDialog(context: context, builder: (context){
+          return AlertDialog(
             title: const Text('Location Permission Required'),
             content: const Text(
               'Location permission is permanently denied. Please enable it from device settings.',
@@ -294,8 +294,8 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> with Widget
                 child: const Text('Open Settings'),
               ),
             ],
-          ),
-        );
+          );
+        });
 
         if (shouldOpen == true) {
           await openAppSettings();
@@ -321,10 +321,11 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> with Widget
     }
     
     // Show loading indicator
-    Get.dialog(
-      const Center(child: CircularProgressIndicator()),
-      barrierDismissible: false,
-    );
+    showDialog(
+        barrierDismissible: false,
+        context: context, builder: (context){
+      return const Center(child: CircularProgressIndicator());
+    });
     
     try {
       await controller.fetchCurrentLocation();
