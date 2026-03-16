@@ -1,8 +1,23 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:ffmpeg_kit_flutter_new_min_gpl/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_new_min_gpl/return_code.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:gallery_media_picker/gallery_media_picker.dart';
+import 'package:get/get.dart';
+import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_manager/photo_manager.dart';
-import '../screens/save_reel_screen.dart';
-import '../../../../../../utils/library_utils.dart';
+import 'package:varnika_app/features/core/screens/reels/create_reels/screens/save_reel_screen.dart';
+import 'package:varnika_app/utils/global.dart';
+import 'package:video_player/video_player.dart' show VideoPlayerController;
+import 'package:video_thumbnail/video_thumbnail.dart';
+import '../../../../../../constarits/images.dart';
+import '../services/trimmed_music_db.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:gallery_media_picker/src/logic/gallery_media_picker_controller.dart';
 
 class CreateReelsController extends GetxController {
   final ImagePicker _picker = ImagePicker();
@@ -109,16 +124,19 @@ class CreateReelsController extends GetxController {
     {'name': 'Sepia', 'filter': 'sepia', 'icon': Icons.auto_awesome,'preview':AppImages.testImg},
     {'name': 'Saturate', 'filter': 'saturate', 'icon': Icons.color_lens,'preview':AppImages.testImg},
   ];
-
+  bool _isGalleryLoaded = false;
+  bool _isLoadingGallery = false;
 
   @override
   void onInit() {
     super.onInit();
-    _clearAllSelections();
-     clearGalleryState();
-    _loadGalleryMediaInBackground();
-    _setupAudioPlayerListeners();
-    reloadGalleryMedia();  }
+    print('=============++++++++++++');
+    // _clearAllSelections();
+    // clearGalleryState();
+    // _loadGalleryMediaInBackground();
+    // _setupAudioPlayerListeners();
+    // reloadGalleryMedia();
+  }
 
   void _clearAllSelections() {
     // Clear preloaded thumbnails
@@ -128,7 +146,7 @@ class CreateReelsController extends GetxController {
     selectedMedia.value = null;
     isVideo.value = false;
     isVideoInitialized.value = false;
-    
+
     // CRITICAL: Clear gallery selections to remove pink selection indicators
     selectedImages.clear();
     selectedImageIndices.clear();
@@ -136,16 +154,16 @@ class CreateReelsController extends GetxController {
     selectedVideo.value = null;
     multiSelectionType.value = 'none';
     isMultipleSelectionMode.value = false;
-    
+
     // CRITICAL: Update refresh key to force GalleryMediaPicker to clear its internal selection state
     galleryPickerRefreshKey.value = DateTime.now().millisecondsSinceEpoch;
-    
+
     // Refresh all reactive lists to update UI
     selectedImages.refresh();
     selectedImageIndices.refresh();
     selectedImagePositions.refresh();
     selectedVideo.refresh();
-    
+
     // Clear video controller
     if (videoController.value != null) {
       try {
@@ -156,19 +174,19 @@ class CreateReelsController extends GetxController {
       }
     }
     videoController.value = null;
-    
+
     // Clear processed/generated videos
     processedVideoFile.value = null;
     generatedVideo.value = null;
     finalizedVideo.value = null;
-    
+
     // Clear editing state
     addedTexts.clear();
     editingTextId.value = '';
     selectedFilterIndex.value = 0;
     selectedFilterTab.value = 0;
     selectedFilterName.value = 'No effect';
-    
+
     // Clear music selection
     selectedMusic.value = '';
     selectedMusicArtist.value = '';
@@ -179,12 +197,12 @@ class CreateReelsController extends GetxController {
     isMusicAppliedToVideo.value = false;
     musicStartTime.value = 0.0;
     musicEndTime.value = 60.0;
-    
+
     // Clear video trim times
     videoStartTime.value = 0.0;
     videoEndTime.value = 0.0;
     videoDuration.value = 0.0;
-    
+
     // CRITICAL: Clear multiple selection state (images/media selections)
     isMultipleSelectionMode.value = false;
     selectedImageIndices.clear();
@@ -192,40 +210,40 @@ class CreateReelsController extends GetxController {
     selectedImagePositions.clear();
     selectedVideo.value = null;
     multiSelectionType.value = 'none';
-    
+
     // Refresh gallery picker to clear visual selections
     galleryPickerRefreshKey.value++;
-    
+
     // Refresh all reactive lists
     selectedImages.refresh();
     selectedImageIndices.refresh();
     selectedImagePositions.refresh();
     selectedVideo.refresh();
-    
+
     // Reset screen state
     currentScreen.value = 0;
     isMusicSelectionActive.value = false;
     isProcessingVideo.value = false;
     processingProgress.value = 0.0;
-    
+
     // Stop any playing music
     try {
       _audioPlayer.stop();
     } catch (e) {
       debugPrint('Error stopping audio: $e');
     }
-    
+
     // Force UI update
     update();
-    
+
     debugPrint('✅ All selections cleared when entering create reels screen');
   }
 
-  @override
-  void onReady() {
-    super.onReady();
-    _checkAndReloadMedia();
-  }
+  // @override
+  // void onReady() {
+  //   super.onReady();
+  //   _checkAndReloadMedia();
+  // }
 
   @override
   void onClose() {
@@ -237,7 +255,19 @@ class CreateReelsController extends GetxController {
 
     super.onClose();
   }
+  Future<void> loadGalleryOnce() async {
+    if (_isGalleryLoaded || _isLoadingGallery) return;
 
+    _isLoadingGallery = true;
+
+    final ps = await PhotoManager.requestPermissionExtend();
+    if (!ps.isAuth) return;
+
+    await _loadGalleryMediaInBackground();
+
+    _isGalleryLoaded = true;
+    _isLoadingGallery = false;
+  }
   void _setupAudioPlayerListeners() async {
     // Configure audio player for device playback
     try {
@@ -251,7 +281,7 @@ class CreateReelsController extends GetxController {
     } catch (e) {
       debugPrint('❌ Error configuring audio player: $e');
     }
-    
+
     _audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
       debugPrint('Audio player state changed: $state');
       // CRITICAL: Update state based on actual player state
@@ -280,7 +310,7 @@ class CreateReelsController extends GetxController {
     });
   }
 
-  void _loadGalleryMediaInBackground() async {
+  Future _loadGalleryMediaInBackground() async {
     // Set loading state to show loading indicator
     isLoadingGallery.value = true;
     clearGalleryState();
@@ -315,7 +345,7 @@ class CreateReelsController extends GetxController {
 
       final List<AssetEntity> media = await albums.first.getAssetListPaged(
         page: 0,
-        size: 100,
+        size: 60,
       );
 
       if (media.isEmpty) {
@@ -329,20 +359,21 @@ class CreateReelsController extends GetxController {
 
       for (final asset in media) {
         try {
-        final thumb = await asset.thumbnailDataWithSize(
-          const ThumbnailSize(200, 200),
-        );
+          final thumb = await asset.thumbnailDataWithSize(
+              const ThumbnailSize(200, 200),
+              quality: 60
+          );
 
-        if (thumb == null) continue;
+          if (thumb == null) continue;
 
-        temp.add({
-          'asset': asset,
-          'type': asset.type == AssetType.video ? 'video' : 'image',
-          'duration': asset.type == AssetType.video
-              ? _formatDuration(asset.videoDuration)
-              : null,
-          'thumbnail': thumb,
-        });
+          temp.add({
+            'asset': asset,
+            'type': asset.type == AssetType.video ? 'video' : 'image',
+            'duration': asset.type == AssetType.video
+                ? _formatDuration(asset.videoDuration)
+                : null,
+            'thumbnail': thumb,
+          });
         } catch (e) {
           debugPrint('Error loading thumbnail: $e');
           continue;
@@ -363,12 +394,12 @@ class CreateReelsController extends GetxController {
       PermissionState? ps;
       try {
         ps = await PhotoManager.requestPermissionExtend();
-    } catch (e) {
+      } catch (e) {
         debugPrint('Permission check failed: $e');
         return;
       }
       if (ps.isAuth) {
-         _loadGalleryMediaInBackground();
+        _loadGalleryMediaInBackground();
         galleryPickerRefreshKey.value++;
       }
     } catch (e) {
@@ -388,7 +419,7 @@ class CreateReelsController extends GetxController {
         debugPrint('Error getting player state (non-critical): $e');
         currentState = PlayerState.stopped;
       }
-      
+
       if (currentState == PlayerState.paused) {
         await _audioPlayer.resume();
         await _audioPlayer.setVolume(1.0);
@@ -418,9 +449,9 @@ class CreateReelsController extends GetxController {
       isMusicPlaying.value = false;
     }
   }
-  Future<void> reloadGalleryMedia() async {
-    await _checkAndReloadMedia();
-  }
+  // Future<void> reloadGalleryMedia() async {
+  //   await _checkAndReloadMedia();
+  // }
 
   bool _isVideoFile(String path) {
     final lowerPath = path.toLowerCase();
@@ -447,7 +478,7 @@ class CreateReelsController extends GetxController {
         }
         bool hasVideo = false;
         bool hasImage = false;
-        
+
         for (final mediaFile in mediaList) {
           final path = mediaFile.path.toLowerCase();
           if (_isVideoFile(path)) {
@@ -468,8 +499,8 @@ class CreateReelsController extends GetxController {
         final Set<String> newSelectedPaths = <String>{};
         for (final mediaFile in mediaList) {
           try {
-          final file = File(mediaFile.path);
-          if (await file.exists()) {
+            final file = File(mediaFile.path);
+            if (await file.exists()) {
               newSelectedPaths.add(file.path);
             }
           } catch (e) {
@@ -477,7 +508,7 @@ class CreateReelsController extends GetxController {
           }
         }
         final itemsToRemove = currentSelectedPaths.difference(newSelectedPaths);
-        
+
         final itemsToAdd = newSelectedPaths.difference(currentSelectedPaths);
         for (final pathToRemove in itemsToRemove) {
           if (selectedVideo.value != null && selectedVideo.value!.path == pathToRemove) {
@@ -538,7 +569,7 @@ class CreateReelsController extends GetxController {
                   continue; // Skip this image
                 }
                 if (!selectedImages.any((f) => f.path == file.path)) {
-              selectedImages.add(file);
+                  selectedImages.add(file);
                   selectedImagePositions[file.path] = selectedImages.length;
                   multiSelectionType.value = 'images';
                   for (int i = 0; i < galleryMedia.length; i++) {
@@ -594,13 +625,13 @@ class CreateReelsController extends GetxController {
           // );
         }
       } else {
-          final mediaFile = mediaList.first;
+        final mediaFile = mediaList.first;
         try {
           final file = File(mediaFile.path);
           if (await file.exists()) {
             selectedMedia.value = file;
             final isVideoFile = _isVideoFile(mediaFile.path);
-            
+
             if (isVideoFile) {
               isVideo.value = true;
               await _initializeVideo(file);
@@ -616,28 +647,28 @@ class CreateReelsController extends GetxController {
               selectedVideo.refresh();
               currentScreen.value = 1;
             } else {isVideo.value = false;
-              isProcessingVideo.value = true;
-              
-              // Show processing indicator
-              // ShowToast.show(
-              //   message: 'Creating video from image...',
-              //   type: ToastType.info,
-              // );
+            isProcessingVideo.value = true;
+
+            // Show processing indicator
+            // ShowToast.show(
+            //   message: 'Creating video from image...',
+            //   type: ToastType.info,
+            // );
             await _convertSingleImageToVideo(file);
-              
-              selectedImages.clear();
-              selectedImageIndices.clear();
-              selectedImagePositions.clear();
-              selectedVideo.value = null;
-              multiSelectionType.value = 'none';
-              galleryPickerRefreshKey.value++;
-              selectedImages.refresh();
-              selectedImageIndices.refresh();
-              selectedImagePositions.refresh();
-              selectedVideo.refresh();
-              currentScreen.value = 1;
-          }
-            
+
+            selectedImages.clear();
+            selectedImageIndices.clear();
+            selectedImagePositions.clear();
+            selectedVideo.value = null;
+            multiSelectionType.value = 'none';
+            galleryPickerRefreshKey.value++;
+            selectedImages.refresh();
+            selectedImageIndices.refresh();
+            selectedImagePositions.refresh();
+            selectedVideo.refresh();
+            currentScreen.value = 1;
+            }
+
             debugPrint('Selected media: ${file.path}, isVideo: $isVideoFile');
           } else {
             // ShowToast.error('Selected file does not exist');
@@ -650,7 +681,7 @@ class CreateReelsController extends GetxController {
       }
     } catch (e) {
       debugPrint('Error handling selected media: $e');
-      ShowToast.error('Failed to process selected media: ${e.toString()}');
+      // ShowToast.error('Failed to process selected media: ${e.toString()}');
     }
   }
   void toggleMultipleSelectionMode() {
@@ -713,13 +744,13 @@ class CreateReelsController extends GetxController {
     for (int i = 0; i < galleryMedia.length; i++) {
       final media = galleryMedia[i];
       if (media['type'] == 'video') continue;
-      
+
       try {
-      final asset = media['asset'] as AssetEntity;
-      final file = await asset.file;
-      if (file != null && file.path == imageFile.path) {
-        galleryIndex = i;
-        break;
+        final asset = media['asset'] as AssetEntity;
+        final file = await asset.file;
+        if (file != null && file.path == imageFile.path) {
+          galleryIndex = i;
+          break;
         }
       } catch (e) {
         debugPrint('Error checking gallery media: $e');
@@ -730,7 +761,7 @@ class CreateReelsController extends GetxController {
     selectedImages.removeAt(imageIndex);
     selectedImagePositions.remove(imageFile.path);
     _recalculateImagePositions();
-    
+
     if (galleryIndex != null) {
       selectedImageIndices.remove(galleryIndex);
     }
@@ -740,7 +771,7 @@ class CreateReelsController extends GetxController {
     }
 
     galleryPickerRefreshKey.value++;
-    
+
     selectedImages.refresh();
     selectedImageIndices.refresh();
     selectedImagePositions.refresh();
@@ -764,9 +795,9 @@ class CreateReelsController extends GetxController {
       final videoFile = selectedVideo.value!;
       selectedMedia.value = videoFile;
       isVideo.value = true;
-      
+
       await _initializeVideo(videoFile);
-      
+
       selectedVideo.value = null;
       selectedImages.clear();
       selectedImageIndices.clear();
@@ -778,9 +809,9 @@ class CreateReelsController extends GetxController {
       selectedImageIndices.refresh();
       selectedImagePositions.refresh();
       selectedVideo.refresh();
-      
+
       currentScreen.value = 1;
-      
+
       debugPrint('Selected video in multi-mode: ${videoFile.path}');
     } catch (e) {
       debugPrint('Error handling selected video: $e');
@@ -799,7 +830,7 @@ class CreateReelsController extends GetxController {
     try {
       final tempDir = await getTemporaryDirectory();
       final outputPath = '${tempDir.path}/slideshow_video_${DateTime.now().millisecondsSinceEpoch}.mp4';
-      
+
       const double durationPerImage = 2.0;
 
       List<File> tempImages = [];
@@ -838,22 +869,22 @@ class CreateReelsController extends GetxController {
 
 
         debugPrint('Creating segment $i: $segmentCommand');
-        
+
         final segmentSession = await FFmpegKit.execute(segmentCommand);
         final segmentReturnCode = await segmentSession.getReturnCode();
-        
+
         if (!ReturnCode.isSuccess(segmentReturnCode)) {
           final output = await segmentSession.getOutput();
           throw Exception('Failed to create segment $i: $output');
         }
-        
+
         final segmentFile = File(segmentPath);
         if (await segmentFile.exists()) {
           segmentFiles.add(segmentFile);
         } else {
           throw Exception('Segment file $i not created');
         }
-        
+
         processingProgress.value = 0.2 + (0.5 * (i + 1) / tempImages.length);
       }
       final concatListPath = '${tempDir.path}/concat_list_${DateTime.now().millisecondsSinceEpoch}.txt';
@@ -863,11 +894,11 @@ class CreateReelsController extends GetxController {
         return "file '$absPath'";
       }).join('\n');
       await concatListFile.writeAsString(concatListContent);
-      
+
       debugPrint('Concat list content:\n$concatListContent');
-      
+
       processingProgress.value = 0.7;
-      
+
       // Concatenate segments
       final concatCommand = '-y '
           '-f concat '
@@ -881,9 +912,9 @@ class CreateReelsController extends GetxController {
           '-b:a 128k '
           '-movflags +faststart '
           '"$outputPath"';
-      
+
       debugPrint('Concatenating segments: $concatCommand');
-      
+
       final command = concatCommand;
 
       debugPrint('Generating slideshow video from ${selectedImages.length} images');
@@ -948,14 +979,14 @@ class CreateReelsController extends GetxController {
             debugPrint('Selected music path: ${selectedMusicPath.value}');
             debugPrint('Video initialized: ${videoController.value?.value.isInitialized}');
             debugPrint('Selected music index: ${selectedMusicIndex.value}');
-            
+
             try {
               final musicIndex = selectedMusicIndex.value >= 0
-                  ? selectedMusicIndex.value 
+                  ? selectedMusicIndex.value
                   : musicList.indexWhere(
-                      (m) => m['audio'] == selectedMusicPath.value,
-                    );
-              
+                    (m) => m['audio'] == selectedMusicPath.value,
+              );
+
               if (musicIndex >= 0 && musicIndex < musicList.length) {
                 final music = musicList[musicIndex];
                 debugPrint('Found music in list, index: $musicIndex, name: ${music['name']}');
@@ -971,7 +1002,7 @@ class CreateReelsController extends GetxController {
                   await Future.delayed(Duration(milliseconds: 500));
                 }
                 await selectMusic(music, musicIndex);
-                
+
                 debugPrint('Music playback initiated, isPlaying: ${isMusicPlaying.value}');
               } else {
                 debugPrint('Music not found in list, trying direct play...');
@@ -986,7 +1017,7 @@ class CreateReelsController extends GetxController {
                   await videoController.value!.setVolume(0.0);
                   await Future.delayed(Duration(milliseconds: 400));
                 }
-                
+
                 await _audioPlayer.stop();
                 await Future.delayed(Duration(milliseconds: 300));
                 try {
@@ -997,7 +1028,7 @@ class CreateReelsController extends GetxController {
                 } catch (e) {
                   debugPrint('Error configuring audio player: $e');
                 }
-                
+
                 final audioPathForPlayer = selectedMusicPath.value.replaceFirst('assets/', '');
                 await _audioPlayer.play(
                   AssetSource(audioPathForPlayer),
@@ -1078,12 +1109,12 @@ class CreateReelsController extends GetxController {
           selectedMedia.value = imageFile;
           isVideo = false;
           isProcessingVideo.value = true;
-          
+
           // ShowToast.show(
           //   message: 'Creating video from image...',
           //   type: ToastType.info,
           // );
-          
+
           await _convertSingleImageToVideo(imageFile);
           selectedImages.clear();
           selectedImageIndices.clear();
@@ -1112,7 +1143,7 @@ class CreateReelsController extends GetxController {
     await _initializeVideo(videoFile);
 
   }
-  
+
   Future<void> _initializeVideo(File videoFile) async {
     try {
       // CRITICAL: Dispose old controller completely before creating new one
@@ -1132,39 +1163,39 @@ class CreateReelsController extends GetxController {
           debugPrint('Error disposing old video controller: $e');
         }
       }
-      
+
       // CRITICAL: Reset state BEFORE creating new controller
       videoController.value = null;
       isVideoInitialized.value = false;
-      
+
       // Force UI update to clear old video player and prevent rendering
       update();
       await Future.delayed(Duration(milliseconds: 300)); // Increased delay for proper cleanup
-      
+
       // Use processed video if available, otherwise use provided videoFile
       final File videoToPlay = processedVideoFile.value ?? videoFile;
-      
+
       debugPrint('Initializing video: ${videoToPlay.path}');
       debugPrint('Video file exists: ${await videoToPlay.exists()}');
-      
+
       // Create new controller
       videoController.value = VideoPlayerController.file(videoToPlay);
-      
+
       // Initialize the controller
       await videoController.value!.initialize();
       lockedAspectRatio = videoController.value!.value.aspectRatio;
 
       // Wait for initialization to complete and native player to be ready
       await Future.delayed(Duration(milliseconds: 300));
-      
+
       // Verify initialization
       if (videoController.value == null || !videoController.value!.value.isInitialized) {
         throw Exception('Video controller failed to initialize');
       }
-      
+
       // Set initialized flag AFTER verification
       isVideoInitialized.value = true;
-      
+
       // Update video duration
       final duration = videoController.value!.value.duration;
       if (duration.inMilliseconds > 0) {
@@ -1173,30 +1204,30 @@ class CreateReelsController extends GetxController {
         videoStartTime.value = 0.0;
         debugPrint('Video duration: ${videoDuration.value}s');
       }
-      
+
       // Set video to loop continuously
       // Note: Rotation metadata is removed during FFmpeg processing to prevent auto-rotation
       videoController.value!.setLooping(true);
-      
+
       // Ensure video restarts when it ends (backup for looping)
       videoController.value!.addListener(_ensureVideoLooping);
-      
+
       // Seek to start position
       await videoController.value!.seekTo(Duration.zero);
-      
+
       // Play video automatically and continuously
       await videoController.value!.play();
-      
+
       // Wait a bit to ensure playback started
       await Future.delayed(Duration(milliseconds: 200));
-      
+
       // Verify video is playing
       if (!videoController.value!.value.isPlaying) {
         debugPrint('Video not playing after play() call, retrying...');
         await videoController.value!.play();
         await Future.delayed(Duration(milliseconds: 200));
       }
-      
+
       // Final verification - if still not playing, try one more time
       if (!videoController.value!.value.isPlaying) {
         debugPrint('Video still not playing, final retry...');
@@ -1204,14 +1235,14 @@ class CreateReelsController extends GetxController {
         await videoController.value!.play();
         await Future.delayed(Duration(milliseconds: 300));
       }
-      
+
       // Update UI multiple times to ensure refresh
       update();
       await Future.delayed(Duration(milliseconds: 100));
       update();
-      
+
       debugPrint('Video initialized successfully: duration=${videoDuration.value}s, isPlaying=${videoController.value!.value.isPlaying}, isInitialized=${videoController.value!.value.isInitialized}');
-      
+
       // CRITICAL: Preload thumbnails in background after video initialization
       _preloadThumbnailsInBackground(videoFile);
     } catch (e) {
@@ -1222,7 +1253,7 @@ class CreateReelsController extends GetxController {
       rethrow;
     }
   }
-  
+
   // Preload thumbnails in background for video trimming (non-blocking)
   Future<void> _preloadThumbnailsInBackground(File? mediaFile) async {
     if (mediaFile == null) {
@@ -1230,13 +1261,13 @@ class CreateReelsController extends GetxController {
       thumbnailMediaPath.value = '';
       return;
     }
-    
+
     // Skip if thumbnails already loaded for this media
     if (thumbnailMediaPath.value == mediaFile.path && preloadedThumbnails.isNotEmpty) {
       debugPrint('✅ Thumbnails already preloaded for: ${mediaFile.path}');
       return;
     }
-    
+
     // Don't preload if not a video
     if (!isVideo.value) {
       // For images, use the image itself as thumbnails
@@ -1255,20 +1286,20 @@ class CreateReelsController extends GetxController {
         return;
       }
     }
-    
+
     // CRITICAL: Start loading thumbnails immediately (not in microtask for faster start)
     isLoadingThumbnails.value = true;
     thumbnailMediaPath.value = mediaFile.path;
-    
+
     // Run in background without blocking UI
     Future.microtask(() async {
       try {
         final thumbnails = <Uint8List?>[];
         final thumbnailCount = 10;
-        
+
         // CRITICAL: Get actual video duration from controller if available
         double maxDuration = 10.0; // Default fallback
-        if (videoController.value != null && 
+        if (videoController.value != null &&
             videoController.value!.value.isInitialized) {
           final duration = videoController.value!.value.duration;
           if (duration.inMilliseconds > 0) {
@@ -1277,14 +1308,14 @@ class CreateReelsController extends GetxController {
         } else if (videoDuration.value > 0) {
           maxDuration = videoDuration.value;
         }
-        
+
         debugPrint('🔄 Preloading $thumbnailCount thumbnails in background for: ${mediaFile.path}, duration: ${maxDuration}s');
-        
+
         for (int i = 0; i < thumbnailCount; i++) {
           try {
             final timeMs = ((maxDuration / thumbnailCount) * i * 1000).toInt();
             final clampedTimeMs = timeMs.clamp(0, (maxDuration * 1000).toInt());
-            
+
             final thumbnailData = await VideoThumbnail.thumbnailData(
               video: mediaFile.path,
               imageFormat: ImageFormat.JPEG,
@@ -1293,7 +1324,7 @@ class CreateReelsController extends GetxController {
               maxWidth: 150, // Further reduced for faster processing
               maxHeight: 150, // Further reduced for faster processing
             );
-            
+
             thumbnails.add(thumbnailData);
             debugPrint('✅ Generated thumbnail $i/$thumbnailCount at ${clampedTimeMs}ms');
           } catch (e) {
@@ -1306,7 +1337,7 @@ class CreateReelsController extends GetxController {
           isLoadingThumbnails.value = false;
           final successCount = thumbnails.where((t) => t != null).length;
           debugPrint('✅ $successCount/$thumbnailCount thumbnails preloaded successfully');
-          
+
           // Force UI update
           update();
         }
@@ -1320,33 +1351,33 @@ class CreateReelsController extends GetxController {
       }
     });
   }
-  
+
   // CRITICAL: Public method to ensure thumbnails are generated (called before opening trimming sheet)
   Future<void> ensureThumbnailsGenerated() async {
-    final mediaFile = processedVideoFile.value ?? 
-                     generatedVideo.value ?? 
-                     selectedMedia.value;
-    
+    final mediaFile = processedVideoFile.value ??
+        generatedVideo.value ??
+        selectedMedia.value;
+
     if (mediaFile == null) {
       debugPrint('⚠️ No media file available for thumbnail generation');
       return;
     }
-    
+
     // Check if thumbnails are already generated for this media
-    if (thumbnailMediaPath.value == mediaFile.path && 
+    if (thumbnailMediaPath.value == mediaFile.path &&
         preloadedThumbnails.isNotEmpty) {
       debugPrint('✅ Thumbnails already generated for: ${mediaFile.path}');
       return;
     }
-    
+
     // If thumbnails are currently loading, wait for them
-    if (isLoadingThumbnails.value && 
+    if (isLoadingThumbnails.value &&
         thumbnailMediaPath.value == mediaFile.path) {
       debugPrint('⏳ Thumbnails are loading, waiting...');
       // Wait up to 5 seconds for loading to complete
       for (int i = 0; i < 50; i++) {
         await Future.delayed(Duration(milliseconds: 100));
-        if (preloadedThumbnails.isNotEmpty && 
+        if (preloadedThumbnails.isNotEmpty &&
             thumbnailMediaPath.value == mediaFile.path) {
           debugPrint('✅ Thumbnails ready after wait');
           return;
@@ -1357,27 +1388,27 @@ class CreateReelsController extends GetxController {
         }
       }
     }
-    
+
     // If no thumbnails available, generate them now (synchronously)
-    if (preloadedThumbnails.isEmpty || 
+    if (preloadedThumbnails.isEmpty ||
         thumbnailMediaPath.value != mediaFile.path) {
       debugPrint('🔄 Generating thumbnails synchronously before opening trimming sheet...');
       await _generateThumbnailsSynchronously(mediaFile);
     }
   }
-  
+
   // CRITICAL: Generate thumbnails synchronously (blocking) - called before opening bottom sheet
   Future<void> _generateThumbnailsSynchronously(File mediaFile) async {
     try {
       isLoadingThumbnails.value = true;
       thumbnailMediaPath.value = mediaFile.path;
-      
+
       final thumbnails = <Uint8List?>[];
       final thumbnailCount = 10;
-      
+
       // Get actual video duration
       double maxDuration = 10.0;
-      if (videoController.value != null && 
+      if (videoController.value != null &&
           videoController.value!.value.isInitialized) {
         final duration = videoController.value!.value.duration;
         if (duration.inMilliseconds > 0) {
@@ -1386,15 +1417,15 @@ class CreateReelsController extends GetxController {
       } else if (videoDuration.value > 0) {
         maxDuration = videoDuration.value;
       }
-      
+
       debugPrint('🔄 Generating $thumbnailCount thumbnails synchronously, duration: ${maxDuration}s');
-      
+
       // Generate thumbnails sequentially
       for (int i = 0; i < thumbnailCount; i++) {
         try {
           final timeMs = ((maxDuration / thumbnailCount) * i * 1000).toInt();
           final clampedTimeMs = timeMs.clamp(0, (maxDuration * 1000).toInt());
-          
+
           final thumbnailData = await VideoThumbnail.thumbnailData(
             video: mediaFile.path,
             imageFormat: ImageFormat.JPEG,
@@ -1403,7 +1434,7 @@ class CreateReelsController extends GetxController {
             maxWidth: 150,
             maxHeight: 150,
           );
-          
+
           thumbnails.add(thumbnailData);
           debugPrint('✅ Generated thumbnail $i/$thumbnailCount');
         } catch (e) {
@@ -1411,13 +1442,13 @@ class CreateReelsController extends GetxController {
           thumbnails.add(null);
         }
       }
-      
+
       // Update thumbnails
       preloadedThumbnails.value = thumbnails;
       isLoadingThumbnails.value = false;
       final successCount = thumbnails.where((t) => t != null).length;
       debugPrint('✅ $successCount/$thumbnailCount thumbnails generated synchronously');
-      
+
       update();
     } catch (e) {
       debugPrint('Error generating thumbnails synchronously: $e');
@@ -1426,32 +1457,32 @@ class CreateReelsController extends GetxController {
       update();
     }
   }
-  
+
   // Clear preloaded thumbnails (call when media changes)
   void clearPreloadedThumbnails() {
     preloadedThumbnails.clear();
     thumbnailMediaPath.value = '';
     isLoadingThumbnails.value = false;
   }
-  
+
   // Ensure video loops continuously
   // CRITICAL: Don't auto-play if music selection is active
   void _ensureVideoLooping() {
     if (videoController.value != null && !isMusicSelectionActive.value) {
       final position = videoController.value!.value.position;
       final duration = videoController.value!.value.duration;
-      
+
       // If video reached the end, restart it (backup for setLooping)
-      if (duration.inMilliseconds > 0 && 
+      if (duration.inMilliseconds > 0 &&
           position.inMilliseconds >= duration.inMilliseconds - 100) {
         videoController.value!.seekTo(Duration.zero);
         if (!isMusicSelectionActive.value) {
-        videoController.value!.play();
+          videoController.value!.play();
         }
       }
-      
+
       // Ensure video is always playing (unless processing or music selection active)
-      if (!isProcessingVideo.value && 
+      if (!isProcessingVideo.value &&
           !isMusicSelectionActive.value &&
           !videoController.value!.value.isPlaying &&
           videoController.value!.value.isInitialized) {
@@ -1459,14 +1490,14 @@ class CreateReelsController extends GetxController {
       }
     }
   }
-  
 
-  
+
+
   // Public method to access _ensureVideoLooping for external use (for removing/adding listener)
   void ensureVideoLooping() {
     _ensureVideoLooping();
   }
-  
+
   // Select audio and auto-play (Instagram Reels behavior)
   // Music plays automatically when selected, controlled by bottom play/pause button
   Future<void> selectMusic(Map<String, dynamic> music, int index) async {
@@ -1489,35 +1520,35 @@ class CreateReelsController extends GetxController {
         debugPrint('❌ Music path is empty');
         return;
       }
-      
+
       // STEP 3: CRITICAL: Ensure video is paused (but don't play music yet)
       if (isVideo.value &&
           videoController.value != null &&
           videoController.value!.value.isInitialized) {
         // Remove auto-play listener to prevent video from restarting
         videoController.value!.removeListener(_ensureVideoLooping);
-        
+
         // Set music selection active to prevent auto-play
         isMusicSelectionActive.value = true;
-        
+
         // Pause video first to stop playback
         await videoController.value!.pause();
         // Set volume to 0 to release audio focus
         await videoController.value!.setVolume(0.0);
         debugPrint('✅ Video paused for music selection');
       }
-      
+
       // Reset trim times to full audio duration when selecting new music
       musicStartTime.value = 0.0;
       // musicEndTime.value = 60.0; // Default max duration
-      
+
       // STEP 4: Wait for audio focus release
       await Future.delayed(const Duration(milliseconds: 200));
-      
+
       // STEP 5: Configure AudioPlayer BEFORE playing
       final audioPathForPlayer = selectedMusicPath.value.replaceFirst('assets/', '');
       debugPrint('🎵 Auto-playing selected music: $audioPathForPlayer');
-      
+
       try {
         // Configure AudioPlayer to request audio focus (Android 12/13 compatible)
         await _audioPlayer.setPlayerMode(PlayerMode.mediaPlayer);
@@ -1527,14 +1558,15 @@ class CreateReelsController extends GetxController {
       } catch (e) {
         debugPrint('❌ Error configuring audio player: $e');
       }
-      
+
       // Small delay to ensure configuration is applied
       await Future.delayed(Duration(milliseconds: 100));
-      
+
       // STEP 6: Play music automatically after selection
       await _audioPlayer.play(AssetSource(audioPathForPlayer), volume: 1.0);
+      isMusicPlaying.value = true;
       update();
-      
+
       debugPrint('✅ Music selected and playing: ${selectedMusic.value}, isPlaying: ${isMusicPlaying.value}');
     } catch (e) {
       isMusicPlaying.value = false;
@@ -1543,6 +1575,7 @@ class CreateReelsController extends GetxController {
       update();
     }
   }
+
 
   // Helper method to retry music playback with full reconfiguration
   Future<void> _retryMusicPlayback(String audioPathForPlayer) async {
@@ -1553,15 +1586,15 @@ class CreateReelsController extends GetxController {
       await _audioPlayer.setVolume(1.0);
       await _audioPlayer.setReleaseMode(ReleaseMode.stop);
       await Future.delayed(Duration(milliseconds: 200));
-        await _audioPlayer.play(
-          AssetSource(audioPathForPlayer),
-          volume: 1.0,
-        );
+      await _audioPlayer.play(
+        AssetSource(audioPathForPlayer),
+        volume: 1.0,
+      );
       await Future.delayed(Duration(milliseconds: 800));
       final position = await _audioPlayer.getCurrentPosition();
-      isMusicPlaying.value = _audioPlayer.state == PlayerState.playing && 
-                             position != null && 
-                             position.inMilliseconds > 0;
+      isMusicPlaying.value = _audioPlayer.state == PlayerState.playing &&
+          position != null &&
+          position.inMilliseconds > 0;
       debugPrint('🔄 Retry result: isPlaying=${isMusicPlaying.value}, position=${position?.inMilliseconds}ms');
     } catch (e) {
       debugPrint('❌ Error retrying music playback: $e');
@@ -1607,7 +1640,7 @@ class CreateReelsController extends GetxController {
     update();
   }
 
-  
+
   // Convert single image to 10-second video (for single image selection)
   Future<void> _convertSingleImageToVideo(File imageFile) async {
     try {
@@ -1640,7 +1673,7 @@ class CreateReelsController extends GetxController {
       final command =
           '-y '
           '-loop 1 '
-          // '-framerate 10 '
+      // '-framerate 10 '
           '-framerate 10 '
           '-i "${tempImage.path}" '
           '-f lavfi '
@@ -1702,9 +1735,9 @@ class CreateReelsController extends GetxController {
       videoDuration.value = 10.0;
 
       processingProgress.value = 1.0;
-      
+
       debugPrint('✅ Single image → 10s video success: $outputPath');
-      
+
       // ShowToast.show(
       //   message: 'Video created successfully',
       //   type: ToastType.success,
@@ -1725,7 +1758,7 @@ class CreateReelsController extends GetxController {
   Future<void> applyTrimmedMusicToVideo() async {
     // Check for video file - prioritize processedVideoFile, then generatedVideo (for multi-image), then selectedMedia
     final videoFile = processedVideoFile.value ?? generatedVideo.value ?? selectedMedia.value;
-    
+
     if (videoFile == null || !isVideo.value || selectedMusicPath.value.isEmpty) {
       // ShowToast.error('No video or music selected');
       return;
@@ -1771,7 +1804,7 @@ class CreateReelsController extends GetxController {
         // Need to loop the audio
         final loopedAudioPath = '${tempDir.path}/looped_audio_${DateTime.now().millisecondsSinceEpoch}.m4a';
         final loopCount = (videoDurationSeconds / segmentDuration).ceil() + 1;
-        
+
         // Create concat file for looping
         final concatListPath = '${tempDir.path}/audio_concat_${DateTime.now().millisecondsSinceEpoch}.txt';
         final concatListFile = File(concatListPath);
@@ -1781,7 +1814,7 @@ class CreateReelsController extends GetxController {
 
         // Concatenate (loop) the audio and trim to exact video duration
         final loopCommand = '-y -f concat -safe 0 -i "$concatListPath" -t ${videoDurationSeconds.toStringAsFixed(3)} -c:a aac -b:a 192k -ar 44100 -ac 2 -f mp4 "$loopedAudioPath"';
-        
+
         debugPrint('🔄 Looping audio: $loopCommand');
         final loopSession = await FFmpegKit.execute(loopCommand);
         final loopReturnCode = await loopSession.getReturnCode();
@@ -1805,11 +1838,11 @@ class CreateReelsController extends GetxController {
         // Video is shorter than segment, trim the audio to match video
         final trimmedToVideoPath = '${tempDir.path}/trimmed_to_video_${DateTime.now().millisecondsSinceEpoch}.m4a';
         final trimToVideoCommand = '-y -i "$trimmedAudioPath" -t ${videoDurationSeconds.toStringAsFixed(3)} -c:a aac -b:a 192k -ar 44100 -ac 2 -f mp4 "$trimmedToVideoPath"';
-        
+
         debugPrint(' Trimming audio to video duration: $trimToVideoCommand');
         final trimToVideoSession = await FFmpegKit.execute(trimToVideoCommand);
         final trimToVideoReturnCode = await trimToVideoSession.getReturnCode();
-        
+
         if (ReturnCode.isSuccess(trimToVideoReturnCode)) {
           finalAudioPath = trimmedToVideoPath;
         }
@@ -1857,28 +1890,28 @@ class CreateReelsController extends GetxController {
             // Continue even if stopping music fails
             isMusicPlaying.value = false;
           }
-          
+
           // STEP 6: Update state with processed video
           processedVideoFile.value = processedFile;
-          
+
           // STEP 7: CRITICAL: Initialize new video controller BEFORE disposing old one
           // This prevents loader from showing during reinitialization
           VideoPlayerController? oldController = videoController.value;
-          
+
           // Create and initialize new controller first (keep old one visible)
           final newController = VideoPlayerController.file(processedFile);
           await newController.initialize();
           await Future.delayed(Duration(milliseconds: 300));
-          
+
           // Verify new controller is initialized
           if (!newController.value.isInitialized) {
             await newController.dispose();
             throw Exception('New video controller failed to initialize');
           }
-          
+
           // Set video to loop continuously
           newController.setLooping(true);
-          
+
           // Update video duration
           final duration = newController.value.duration;  // Returns Duration
           if (duration.inMilliseconds > 0) {                       // Same pattern
@@ -1886,7 +1919,7 @@ class CreateReelsController extends GetxController {
             videoEndTime.value = videoDuration.value;
             videoStartTime.value = 0.0;
           }
-          
+
           // Now dispose old controller and swap
           if (oldController != null) {
             try {
@@ -1902,22 +1935,22 @@ class CreateReelsController extends GetxController {
               debugPrint('Error disposing old controller: $e');
             }
           }
-          
+
           // Swap to new controller (no gap - no loader shown)
           videoController.value = newController;
           isVideoInitialized.value = true;
-          
+
           // Add listener for looping
           newController.addListener(_ensureVideoLooping);
-          
+
           // Seek to start and play
           await newController.seekTo(Duration.zero);
           await newController.play();
           await Future.delayed(Duration(milliseconds: 200));
-          
+
           // STEP 8: Preload thumbnails for the new processed video
           _preloadThumbnailsInBackground(processedFile);
-          
+
           // STEP 9: Ensure video is playing with music
           if (videoController.value != null && videoController.value!.value.isInitialized) {
             try {
@@ -1931,13 +1964,13 @@ class CreateReelsController extends GetxController {
               debugPrint('❌ Error ensuring video playback: $e');
             }
           }
-          
+
           // Force UI update
           update();
 
           // STEP 10: Mark music as applied to video
           isMusicAppliedToVideo.value = true;
-          
+
           // CRITICAL: Ensure music selection state is preserved
           // This ensures the music indicator shows even after music is applied to video
           if (selectedMusic.value.isEmpty && selectedMusicPath.value.isNotEmpty) {
@@ -1950,15 +1983,15 @@ class CreateReelsController extends GetxController {
               selectedMusicImgPath.value = music['image'] ?? '';
             }
           }
-          
+
           processingProgress.value = 1.0;
-          
+
           // CRITICAL: Stop processing immediately after video is ready to remove loader
           isProcessingVideo.value = false;
           processingProgress.value = 0.0;
 
           // ShowToast.success('Trimmed music applied successfully!');
-          
+
           // STEP 11: Update UI to show music indicator
           // Force reactive updates to ensure UI rebuilds
           selectedMusic.refresh();
@@ -1966,7 +1999,7 @@ class CreateReelsController extends GetxController {
           selectedMusicImgPath.refresh();
           isMusicAppliedToVideo.refresh();
           update();
-          
+
           debugPrint('✅ Trimmed music applied: video=${processedFile.path}, music=${selectedMusic.value}');
         } else {
           throw Exception('Processed video file not found');
@@ -2007,7 +2040,7 @@ class CreateReelsController extends GetxController {
         update();
       }
     }
-}
+  }
 
   // Copy asset file to temporary location
   Future<String> _copyAssetToTemp(String assetPath) async {
@@ -2015,20 +2048,20 @@ class CreateReelsController extends GetxController {
       // Read asset file
       final ByteData data = await rootBundle.load(assetPath);
       final Uint8List bytes = data.buffer.asUint8List();
-      
+
       // Write to temp file
       final Directory tempDir = await getTemporaryDirectory();
       final String tempPath = '${tempDir.path}/temp_audio_${DateTime.now().millisecondsSinceEpoch}.${assetPath.split('.').last}';
       final File tempFile = File(tempPath);
       await tempFile.writeAsBytes(bytes);
-      
+
       return tempPath;
     } catch (e) {
       debugPrint('Error copying asset to temp: $e');
       rethrow;
     }
   }
-  
+
   // Toggle music play/pause (Instagram Reels behavior)
   // CRITICAL: Ensures video is paused and audio focus is released
   Future<void> toggleMusicPlayPause() async {
@@ -2048,11 +2081,11 @@ class CreateReelsController extends GetxController {
         // If we can't get state, assume stopped
         currentState = PlayerState.stopped;
       }
-      
+
       if (currentState == PlayerState.playing) {
         // Currently playing - pause it
-      await _audioPlayer.pause();
-      isMusicPlaying.value = false;
+        await _audioPlayer.pause();
+        isMusicPlaying.value = false;
         debugPrint('⏸️ Music paused');
       } else if (currentState == PlayerState.paused) {
         // Currently paused - resume it
@@ -2070,8 +2103,8 @@ class CreateReelsController extends GetxController {
           await videoController.value!.setVolume(0.0);
           await Future.delayed(Duration(milliseconds: 400));
         }
-        
-      await _audioPlayer.resume();
+
+        await _audioPlayer.resume();
         await Future.delayed(Duration(milliseconds: 600));
         try {
           isMusicPlaying.value = _audioPlayer.state == PlayerState.playing;
@@ -2084,27 +2117,27 @@ class CreateReelsController extends GetxController {
         // Stopped or completed - start playing from beginning
         final audioPathForPlayer = selectedMusicPath.value.replaceFirst('assets/', '');
         debugPrint('🎵 Starting music from beginning: $audioPathForPlayer');
-        
-      // CRITICAL FIX #1: Release video audio focus COMPLETELY before playing music
-      if (isVideo.value &&
-          videoController.value != null &&
-          videoController.value!.value.isInitialized) {
-        // Set volume to 0 FIRST (before pause) to release audio focus on Android
-        await videoController.value!.setVolume(0.0);
-        await videoController.value!.pause();
-        try {
-          final currentPosition = videoController.value!.value.position;
-          await videoController.value!.seekTo(currentPosition);
-        } catch (e) {
-          debugPrint('Warning: Could not seek video: $e');
+
+        // CRITICAL FIX #1: Release video audio focus COMPLETELY before playing music
+        if (isVideo.value &&
+            videoController.value != null &&
+            videoController.value!.value.isInitialized) {
+          // Set volume to 0 FIRST (before pause) to release audio focus on Android
+          await videoController.value!.setVolume(0.0);
+          await videoController.value!.pause();
+          try {
+            final currentPosition = videoController.value!.value.position;
+            await videoController.value!.seekTo(currentPosition);
+          } catch (e) {
+            debugPrint('Warning: Could not seek video: $e');
+          }
+          await Future.delayed(Duration(milliseconds: 500));
         }
-        await Future.delayed(Duration(milliseconds: 500));
-      }
-        
+
         // CRITICAL FIX #2: Ensure single AudioPlayer instance - stop completely first
         await _audioPlayer.stop();
         await Future.delayed(Duration(milliseconds: 400));
-        
+
         // Configure audio player for device playback
         try {
           await _audioPlayer.setPlayerMode(PlayerMode.lowLatency);
@@ -2114,15 +2147,15 @@ class CreateReelsController extends GetxController {
         } catch (e) {
           debugPrint('❌ Error configuring audio player: $e');
         }
-        
+
         await _audioPlayer.play(
           AssetSource(audioPathForPlayer),
           volume: 1.0,
         );
-        
+
         // Wait for playback to start and audio focus to be granted
         await Future.delayed(Duration(milliseconds: 800));
-        
+
         // CRITICAL: Verify playback started AND position is advancing (prevent silent failures)
         try {
           if (_audioPlayer.state == PlayerState.playing) {
@@ -2130,7 +2163,7 @@ class CreateReelsController extends GetxController {
             try {
               final position = await _audioPlayer.getCurrentPosition();
               if (position != null && position.inMilliseconds > 0) {
-      isMusicPlaying.value = true;
+                isMusicPlaying.value = true;
                 debugPrint('✅ Music started from beginning successfully, position: ${position.inMilliseconds}ms');
               } else {
                 debugPrint('⚠️ Music state is playing but position is 0, retrying...');
@@ -2156,7 +2189,7 @@ class CreateReelsController extends GetxController {
           await _retryMusicPlayback(audioPathForPlayer);
         }
       }
-      
+
       // Force UI update
       update();
     } catch (e) {
@@ -2166,7 +2199,7 @@ class CreateReelsController extends GetxController {
       update();
     }
   }
-  
+
   // Stop music
   Future<void> stopMusic() async {
     try {
@@ -2203,7 +2236,7 @@ class CreateReelsController extends GetxController {
         debugPrint('❌ No music selected to play');
         return;
       }
-      
+
       // If already playing, do nothing (toggleMusicPlayPause handles pause)
       try {
         if (isMusicPlaying.value && _audioPlayer.state == PlayerState.playing) {
@@ -2214,7 +2247,7 @@ class CreateReelsController extends GetxController {
         debugPrint('Error checking player state (non-critical): $e');
         // Continue to play music
       }
-      
+
       // CRITICAL: Ensure video is paused before playing music
       if (isVideo.value &&
           videoController.value != null &&
@@ -2224,10 +2257,10 @@ class CreateReelsController extends GetxController {
         videoController.value!.removeListener(_ensureVideoLooping);
         isMusicSelectionActive.value = true;
       }
-      
+
       // Wait for audio focus release
       await Future.delayed(const Duration(milliseconds: 500));
-      
+
       // If paused, resume. Otherwise, stop and play from beginning
       PlayerState? currentState;
       try {
@@ -2236,7 +2269,7 @@ class CreateReelsController extends GetxController {
         debugPrint('Error getting player state (non-critical): $e');
         currentState = PlayerState.stopped;
       }
-      
+
       if (currentState == PlayerState.paused) {
         // Resume paused music
         await _audioPlayer.resume();
@@ -2252,17 +2285,17 @@ class CreateReelsController extends GetxController {
         // Stop any existing playback and play from beginning
         await _audioPlayer.stop();
         await Future.delayed(Duration(milliseconds: 400));
-        
+
         // Configure and play
         final audioPathForPlayer = selectedMusicPath.value.replaceFirst('assets/', '');
         await _audioPlayer.setPlayerMode(PlayerMode.lowLatency);
         await _audioPlayer.setReleaseMode(ReleaseMode.stop);
         await _audioPlayer.setVolume(1.0);
         await Future.delayed(Duration(milliseconds: 100));
-        
+
         await _audioPlayer.play(AssetSource(audioPathForPlayer), volume: 1.0);
         await Future.delayed(Duration(milliseconds: 800));
-        
+
         // Verify playback
         try {
           if (_audioPlayer.state == PlayerState.playing) {
@@ -2292,7 +2325,7 @@ class CreateReelsController extends GetxController {
           isMusicPlaying.value = false;
         }
       }
-      
+
       update();
     } catch (e) {
       debugPrint('❌ Error playing selected music: $e');
@@ -2309,7 +2342,7 @@ class CreateReelsController extends GetxController {
         debugPrint('❌ No music selected to play');
         return;
       }
-      
+
       // If already playing, do nothing
       try {
         if (isMusicPlaying.value && _audioPlayer.state == PlayerState.playing) {
@@ -2320,7 +2353,7 @@ class CreateReelsController extends GetxController {
         debugPrint('Error checking player state (non-critical): $e');
         // Continue to play music
       }
-      
+
       // CRITICAL: Don't pause video - just ensure it's muted
       if (isVideo.value &&
           videoController.value != null &&
@@ -2330,10 +2363,10 @@ class CreateReelsController extends GetxController {
         // Keep video playing - don't remove listener
         debugPrint('✅ Video muted for background music');
       }
-      
+
       // Wait for audio focus
       await Future.delayed(const Duration(milliseconds: 300));
-      
+
       // If paused, resume. Otherwise, stop and play from beginning
       PlayerState? currentState;
       try {
@@ -2342,7 +2375,7 @@ class CreateReelsController extends GetxController {
         debugPrint('Error getting player state (non-critical): $e');
         currentState = PlayerState.stopped;
       }
-      
+
       if (currentState == PlayerState.paused) {
         // Resume paused music
         await _audioPlayer.resume();
@@ -2358,17 +2391,17 @@ class CreateReelsController extends GetxController {
         // Stop any existing playback and play from beginning
         await _audioPlayer.stop();
         await Future.delayed(Duration(milliseconds: 300));
-        
+
         // Configure and play
         final audioPathForPlayer = selectedMusicPath.value.replaceFirst('assets/', '');
         await _audioPlayer.setPlayerMode(PlayerMode.mediaPlayer); // Use mediaPlayer for better compatibility
         await _audioPlayer.setReleaseMode(ReleaseMode.loop); // Loop music
         await _audioPlayer.setVolume(1.0);
         await Future.delayed(Duration(milliseconds: 100));
-        
+
         await _audioPlayer.play(AssetSource(audioPathForPlayer), volume: 1.0);
         await Future.delayed(Duration(milliseconds: 600));
-        
+
         // Verify playback
         try {
           if (_audioPlayer.state == PlayerState.playing) {
@@ -2398,7 +2431,7 @@ class CreateReelsController extends GetxController {
           isMusicPlaying.value = false;
         }
       }
-      
+
       update();
     } catch (e) {
       debugPrint('❌ Error playing background music with video: $e');
@@ -2406,7 +2439,7 @@ class CreateReelsController extends GetxController {
       update();
     }
   }
-  
+
   // Get current music playback position (for waveform UI binding)
   // CRITICAL FIX #3: Expose position for waveform UI
   Future<Duration?> getCurrentMusicPosition() async {
@@ -2427,7 +2460,7 @@ class CreateReelsController extends GetxController {
       return null;
     }
   }
-  
+
   // Get audio duration (for trimming UI)
   Future<Duration?> getAudioDuration() async {
     try {
@@ -2450,7 +2483,7 @@ class CreateReelsController extends GetxController {
       return null;
     }
   }
-  
+
   // Play music at specific position (for trimming preview)
   // CRITICAL: Android audio focus - VideoPlayer releases focus, AudioPlayer gains it
   Future<void> playMusicAtPosition(double startTime, double endTime) async {
@@ -2561,13 +2594,13 @@ class CreateReelsController extends GetxController {
         // Music not applied yet - just play preview
         return;
       }
-      
+
       // Stop any currently playing music
       await stopMusic();
-      
+
       // Convert path from "assets/audio/audio1.mpeg" to "audio/audio1.mpeg"
       String audioPath = selectedMusicPath.value.replaceFirst('assets/', '');
-      
+
       // If video exists and music is applied, play from video
       // Use processedVideoFile if available (has music), otherwise use selectedMedia
       final videoToProcess = processedVideoFile.value ?? generatedVideo.value ?? selectedMedia.value;
@@ -2586,20 +2619,20 @@ class CreateReelsController extends GetxController {
       debugPrint('Audio path error: $selectedMusicPath');
     }
   }
-  
+
   // Add text with draggable functionality
   void addText(
-    String text,
-    Color color,
-    double fontSize,
-    Offset position, {
-    String fontStyle = 'Roboto',
-    bool isBold = false,
-    bool isItalic = false,
-    bool hasUnderline = false,
-    Color? backgroundColor,
-    TextAlign textAlign = TextAlign.center,
-  }) {
+      String text,
+      Color color,
+      double fontSize,
+      Offset position, {
+        String fontStyle = 'Roboto',
+        bool isBold = false,
+        bool isItalic = false,
+        bool hasUnderline = false,
+        Color? backgroundColor,
+        TextAlign textAlign = TextAlign.center,
+      }) {
     addedTexts.add({
       'text': text,
       'color': color,
@@ -2617,7 +2650,7 @@ class CreateReelsController extends GetxController {
       'id': DateTime.now().millisecondsSinceEpoch.toString(),
     });
   }
-  
+
   // Update text position
   void updateTextPosition(String id, Offset position) {
     final index = addedTexts.indexWhere((t) => t['id'] == id);
@@ -2626,29 +2659,29 @@ class CreateReelsController extends GetxController {
       addedTexts.refresh(); // 🔥 REQUIRED
     }
   }
-  
+
   // Update text scale - inversely affects font size (zoom in = smaller text, zoom out = larger text)
   void updateTextScale(String id, double scale) {
     final index = addedTexts.indexWhere((t) => t['id'] == id);
     if (index != -1) {
       final currentFontSize = addedTexts[index]['fontSize'] as double;
       final baseFontSize = addedTexts[index]['baseFontSize'] as double? ?? currentFontSize;
-      
+
       // Store base font size if not already stored
       if (addedTexts[index]['baseFontSize'] == null) {
         addedTexts[index]['baseFontSize'] = currentFontSize;
       }
-      
+
       // Inverse relationship: scale up = font size down, scale down = font size up
       // Formula: fontSize = baseFontSize / scale
       final newFontSize = (baseFontSize / scale).clamp(8.0, 72.0);
-      
+
       addedTexts[index]['scale'] = scale;
       addedTexts[index]['fontSize'] = newFontSize;
       addedTexts.refresh(); // 🔥 REQUIRED
     }
   }
-  
+
   // Update text rotation
   void updateTextRotation(String id, double rotation) {
     final index = addedTexts.indexWhere((t) => t['id'] == id);
@@ -2657,23 +2690,23 @@ class CreateReelsController extends GetxController {
       addedTexts.refresh(); // 🔥 REQUIRED
     }
   }
-  
+
   // Remove text
   void removeText(String id) {
     addedTexts.removeWhere((text) => text['id'] == id);
   }
-  
+
   void updateTextStyle(
-    String id, {
-    bool? isBold,
-    bool? isItalic,
-    bool? hasUnderline,
-    Color? color,
-    double? fontSize,
-    String? fontStyle,
-    Color? backgroundColor,
-    TextAlign? textAlign,
-  }) {
+      String id, {
+        bool? isBold,
+        bool? isItalic,
+        bool? hasUnderline,
+        Color? color,
+        double? fontSize,
+        String? fontStyle,
+        Color? backgroundColor,
+        TextAlign? textAlign,
+      }) {
     final index = addedTexts.indexWhere((t) => t['id'] == id);
     if (index != -1) {
       if (isBold != null) {
@@ -2705,13 +2738,13 @@ class CreateReelsController extends GetxController {
       addedTexts.refresh(); // 🔥 REQUIRED
     }
   }
-  
+
   void toggleTextBackground(String id) {
     final index = addedTexts.indexWhere((t) => t['id'] == id);
     if (index != -1) {
       final currentBg = addedTexts[index]['backgroundColor'] as Color?;
       Color? newBg;
-      
+
       if (currentBg == null) {
         // No background → White background
         newBg = Colors.white;
@@ -2725,164 +2758,164 @@ class CreateReelsController extends GetxController {
         // Any other color → White background
         newBg = Colors.white;
       }
-      
+
       addedTexts[index]['backgroundColor'] = newBg;
-      
+
       // Auto-adjust text color based on background (only for white/black text colors)
       Color currentTextColor = addedTexts[index]['color'] as Color;
       // Only change text color if it's white or black
       if (currentTextColor == Colors.white || currentTextColor == Colors.black) {
-      if (newBg == Colors.white) {
-        // White background → black text
-        addedTexts[index]['color'] = Colors.black;
-      } else if (newBg == Colors.black) {
-        // Black background → white text
-        addedTexts[index]['color'] = Colors.white;
-      }
+        if (newBg == Colors.white) {
+          // White background → black text
+          addedTexts[index]['color'] = Colors.black;
+        } else if (newBg == Colors.black) {
+          // Black background → white text
+          addedTexts[index]['color'] = Colors.white;
+        }
         // If removing background, keep current text color
       }
       // If text color is other than white/black, don't change it
-      
+
       addedTexts.refresh(); // 🔥 REQUIRED
     }
   }
 
-  
+
   // Apply filter (custom implementation using ColorFilter)
   void applyFilter(int index, int tabIndex) {
     selectedFilterIndex.value = index;
     selectedFilterTab.value = tabIndex;
-    
+
     final filters = tabIndex == 0 ? aestheticsFilters : specialEffectsFilters;
     final filter = filters[index];
     final filterName = filter['name'] as String;
 
     selectedFilterName.value = filterName;
-    
+
     // ShowToast.show(message: 'Filter applied: $filterName', type: ToastType.success);
   }
-  
+
   // Get ColorFilter for the selected filter
   ColorFilter? getSelectedColorFilter() {
     if (selectedFilterIndex.value == 0) {
       return null; // No filter
     }
-    
-    final filters = selectedFilterTab.value == 0 
-        ? aestheticsFilters 
+
+    final filters = selectedFilterTab.value == 0
+        ? aestheticsFilters
         : specialEffectsFilters;
     final filter = filters[selectedFilterIndex.value];
     final filterType = filter['filter'] as String;
-    
+
     return _getColorFilterForType(filterType);
   }
-  
+
   // Get ColorFilter matrix for filter type
   ColorFilter? _getColorFilterForType(String filterType) {
     switch (filterType) {
       case 'vintage':
-        // Vintage filter: warm sepia tone
+      // Vintage filter: warm sepia tone
         return ColorFilter.matrix([
           0.9, 0.5, 0.1, 0, 0,
           0.3, 0.8, 0.1, 0, 0,
           0.2, 0.3, 0.5, 0, 0,
           0, 0, 0, 1, 0,
         ]);
-      
+
       case 'bw':
-        // Black and white filter
+      // Black and white filter
         return ColorFilter.matrix([
           0.2126, 0.7152, 0.0722, 0, 0,
           0.2126, 0.7152, 0.0722, 0, 0,
           0.2126, 0.7152, 0.0722, 0, 0,
           0, 0, 0, 1, 0,
         ]);
-      
+
       case 'warm':
-        // Warm filter: increased red/yellow
+      // Warm filter: increased red/yellow
         return ColorFilter.matrix([
           1.2, 0, 0, 0, 0,
           0.1, 1.1, 0, 0, 0,
           0, 0, 0.9, 0, 0,
           0, 0, 0, 1, 0,
         ]);
-      
+
       case 'cool':
-        // Cool filter: increased blue
+      // Cool filter: increased blue
         return ColorFilter.matrix([
           0.9, 0, 0, 0, 0,
           0, 0.9, 0, 0, 0,
           0, 0, 1.2, 0, 0,
           0, 0, 0, 1, 0,
         ]);
-      
+
       case 'bright':
-        // Bright filter: increased brightness
+      // Bright filter: increased brightness
         return ColorFilter.matrix([
           1.3, 0, 0, 0, 20,
           0, 1.3, 0, 0, 20,
           0, 0, 1.3, 0, 20,
           0, 0, 0, 1, 0,
         ]);
-      
+
       case 'sepia':
-        // Sepia filter
+      // Sepia filter
         return ColorFilter.matrix([
           0.393, 0.769, 0.189, 0, 0,
           0.349, 0.686, 0.168, 0, 0,
           0.272, 0.534, 0.131, 0, 0,
           0, 0, 0, 1, 0,
         ]);
-      
+
       case 'saturate':
-        // High saturation
+      // High saturation
         return ColorFilter.matrix([
           1.5, 0, 0, 0, 0,
           0, 1.5, 0, 0, 0,
           0, 0, 1.5, 0, 0,
           0, 0, 0, 1, 0,
         ]);
-      
+
       case 'vignette':
-        // Vignette effect (darkened edges) - applied via gradient overlay
+      // Vignette effect (darkened edges) - applied via gradient overlay
         return null; // Will be handled separately
-      
+
       case 'fog':
-        // Fog effect: desaturated and slightly brightened
+      // Fog effect: desaturated and slightly brightened
         return ColorFilter.matrix([
           0.8, 0.1, 0.1, 0, 30,
           0.1, 0.8, 0.1, 0, 30,
           0.1, 0.1, 0.8, 0, 30,
           0, 0, 0, 1, 0,
         ]);
-      
+
       case 'ripple':
-        // Ripple effect: slight color shift
+      // Ripple effect: slight color shift
         return ColorFilter.matrix([
           1, 0.1, 0, 0, 0,
           0, 1, 0.1, 0, 0,
           0.1, 0, 1, 0, 0,
           0, 0, 0, 1, 0,
         ]);
-      
+
       case 'cloud':
-        // Cloud effect: soft, desaturated
+      // Cloud effect: soft, desaturated
         return ColorFilter.matrix([
           0.9, 0.05, 0.05, 0, 20,
           0.05, 0.9, 0.05, 0, 20,
           0.05, 0.05, 0.9, 0, 20,
           0, 0, 0, 1, 0,
         ]);
-      
+
       case 'party_lights':
-        // Party lights: vibrant colors
+      // Party lights: vibrant colors
         return ColorFilter.matrix([
           1.2, 0, 0, 0, 0,
           0, 1.2, 0, 0, 0,
           0, 0, 1.2, 0, 0,
           0, 0, 0, 1, 0,
         ]);
-      
+
       default:
         return null;
     }
@@ -2901,16 +2934,16 @@ class CreateReelsController extends GetxController {
   // Check if filter needs gradient overlay (for vignette)
   bool needsGradientOverlay() {
     if (selectedFilterIndex.value == 0) return false;
-    
-    final filters = selectedFilterTab.value == 0 
-        ? aestheticsFilters 
+
+    final filters = selectedFilterTab.value == 0
+        ? aestheticsFilters
         : specialEffectsFilters;
     final filter = filters[selectedFilterIndex.value];
     final filterType = filter['filter'] as String;
-    
+
     return filterType == 'vignette';
   }
-  
+
   // Set video trim times
   void setVideoTrimTimes(double start, double end) {
     videoStartTime.value = start;
@@ -2919,47 +2952,47 @@ class CreateReelsController extends GetxController {
       videoController.value!.seekTo(Duration(milliseconds: (start * 1000).toInt()));
     }
   }
-  
+
   // Create finalized video with all edits (trim, text, filters, music)
   Future<File?> createFinalizedVideo(BuildContext context) async {
     if (selectedMedia.value == null) {
       // ShowToast.error('Please select media first');
       return null;
     }
-    
+
     isProcessingVideo.value = true;
-    
+
     try {
       // Get the base video (prioritize processed > generated > selected)
-      File? baseVideo = processedVideoFile.value ?? 
-                       generatedVideo.value ?? 
-                       selectedMedia.value;
-      
+      File? baseVideo = processedVideoFile.value ??
+          generatedVideo.value ??
+          selectedMedia.value;
+
       if (baseVideo == null || !await baseVideo.exists()) {
         throw Exception('Base video file not found');
       }
-      
+
       // If it's an image, we need to convert it first
       if (!isVideo.value && generatedVideo.value == null) {
         throw Exception('Image must be converted to video first');
       }
-      
+
       final tempDir = await getTemporaryDirectory();
       final outputPath = '${tempDir.path}/finalized_video_${DateTime.now().millisecondsSinceEpoch}.mp4';
-      
+
       // Build FFmpeg command to apply all edits
       String videoInput = baseVideo.path;
       List<String> videoFilters = [];
       List<String> audioInputs = [];
-      
+
       // 1. Apply trim if needed
       double startTime = videoStartTime.value;
       double duration = (videoEndTime.value - videoStartTime.value).clamp(0.1, 3600.0);
-      
+
       // 2. Build text overlay filters
       // Note: FFmpeg drawtext on Android requires a font file path
       // We'll try to use a system font or skip if not available
-      
+
       // Get video dimensions for proper text positioning
       int? videoWidth;
       int? videoHeight;
@@ -2972,11 +3005,11 @@ class CreateReelsController extends GetxController {
       } catch (e) {
         debugPrint('Error getting video dimensions: $e');
       }
-      
+
       // Default dimensions if not available
       videoWidth ??= 720;
       videoHeight ??= 1280;
-      
+
       // Try to find a system font file on Android
       // Common Android system font paths
       List<String> possibleFontPaths = [
@@ -2985,7 +3018,7 @@ class CreateReelsController extends GetxController {
         '/system/fonts/NotoSans-Regular.ttf',
         '/system/fonts/AndroidClock.ttf',
       ];
-      
+
       String? fontPath;
       for (String path in possibleFontPaths) {
         try {
@@ -2999,20 +3032,20 @@ class CreateReelsController extends GetxController {
           // Continue to next font path
         }
       }
-      
+
       // Build text overlays if font is available
       if (addedTexts.isNotEmpty && fontPath != null) {
         for (int i = 0; i < addedTexts.length; i++) {
           final textData = addedTexts[i];
           final text = textData['text'] as String? ?? '';
           if (text.isEmpty) continue;
-          
+
           final color = textData['color'] as Color? ?? Colors.white;
           final fontSize = textData['fontSize'] as double? ?? 20.0;
           final position = textData['position'] as Offset? ?? Offset.zero;
           final isBold = textData['isBold'] as bool? ?? false;
           final backgroundColor = textData['backgroundColor'] as Color?;
-          
+
           // Escape text for FFmpeg (escape special characters)
           String escapedText = text
               .replaceAll('\\', '\\\\')
@@ -3022,20 +3055,20 @@ class CreateReelsController extends GetxController {
               .replaceAll("'", "\\'")
               .replaceAll('"', '\\"')
               .replaceAll('\n', '\\n');
-          
+
           // Convert color to hex (format: 0xRRGGBB)
           int r = color.r.round();
           int g = color.g.round();
           int b = color.b.round();
           String colorHex = '0x${r.toRadixString(16).padLeft(2, '0')}${g.toRadixString(16).padLeft(2, '0')}${b.toRadixString(16).padLeft(2, '0')}';
-          
+
           // Calculate position relative to video dimensions
           // Position is stored relative to screen, need to scale to video dimensions
           double xRatio = position.dx / (MediaQuery.of(context).size.width);
           double yRatio = position.dy / (MediaQuery.of(context).size.height);
           int x = (xRatio * videoWidth).toInt().clamp(0, videoWidth);
           int y = (yRatio * videoHeight).toInt().clamp(0, videoHeight);
-          
+
           // Build text box if background color is set
           String boxParams = '';
           if (backgroundColor != null) {
@@ -3045,26 +3078,26 @@ class CreateReelsController extends GetxController {
             String bgColorHex = '0x${bgR.toRadixString(16).padLeft(2, '0')}${bgG.toRadixString(16).padLeft(2, '0')}${bgB.toRadixString(16).padLeft(2, '0')}';
             boxParams = ':box=1:boxcolor=$bgColorHex@0.8:boxborderw=5';
           }
-          
+
           // Build font size (increase for bold effect)
           int finalFontSize = isBold ? (fontSize * 1.2).toInt() : fontSize.toInt();
-          
+
           // Add text overlay filter with font file
           videoFilters.add(
-            "drawtext=fontfile='$fontPath':text='$escapedText':fontcolor=$colorHex:x=$x:y=$y:fontsize=$finalFontSize$boxParams"
+              "drawtext=fontfile='$fontPath':text='$escapedText':fontcolor=$colorHex:x=$x:y=$y:fontsize=$finalFontSize$boxParams"
           );
         }
       } else if (addedTexts.isNotEmpty && fontPath == null) {
         debugPrint('Warning: No system font found. Text overlays will not be rendered in final video.');
         debugPrint('Text overlays (${addedTexts.length}) are visible in UI but not in exported video.');
       }
-      
+
       // 3. Build filter complex
       String filterComplex = '';
       if (videoFilters.isNotEmpty) {
         filterComplex = '-vf "${videoFilters.join(',')}"';
       }
-      
+
       // 4. Handle audio
       // String audioCommand = '';
       if (selectedMusicPath.value.isNotEmpty) {
@@ -3077,7 +3110,7 @@ class CreateReelsController extends GetxController {
         // Keep original audio
         // audioCommand = '-c:a copy';
       }
-      
+
       // 5. Build final FFmpeg command
       // If no filters, don't include -vf parameter
       // Added codec parameters to avoid MediaCodec warnings
@@ -3099,10 +3132,10 @@ class CreateReelsController extends GetxController {
 
 
       debugPrint('Finalizing video with command: $command');
-      
+
       final session = await FFmpegKit.execute(command);
       final returnCode = await session.getReturnCode();
-      
+
       if (!ReturnCode.isSuccess(returnCode)) {
         final output = await session.getOutput();
         final failureStackTrace = await session.getFailStackTrace();
@@ -3110,12 +3143,12 @@ class CreateReelsController extends GetxController {
         debugPrint('FFmpeg failure stack trace: $failureStackTrace');
         throw Exception('FFmpeg failed to finalize video: ${output ?? failureStackTrace ?? "Unknown error"}');
       }
-      
+
       final finalizedFile = File(outputPath);
       if (!await finalizedFile.exists()) {
         throw Exception('Finalized video file not created');
       }
-      
+
       finalizedVideo.value = finalizedFile;
       update();
       debugPrint('✅ Video finalized successfully: $outputPath');
@@ -3129,14 +3162,14 @@ class CreateReelsController extends GetxController {
       isProcessingVideo.value = false;
     }
   }
-  
+
   // Post reel - navigate to save reel screen (only generates cover image, preserves editing state)
   Future<void> postReel() async {
     if (selectedMedia.value == null) {
       // ShowToast.error('Please select media first');
       return;
     }
-    
+
     try {
       // 🔴 STEP 1: Stop background music completely
       await stopMusic();
@@ -3149,16 +3182,16 @@ class CreateReelsController extends GetxController {
         try {
           // Remove auto-play listener to prevent video from restarting
           videoController.value!.removeListener(_ensureVideoLooping);
-          
+
           // Pause video first to stop playback
           await videoController.value!.pause();
-          
+
           // Mute video's audio track to stop video's music/audio
           await videoController.value!.setVolume(0.0);
-          
+
           // Set music selection active to prevent auto-play
           isMusicSelectionActive.value = true;
-          
+
           debugPrint('✅ Video paused, muted, and auto-play disabled on Next button');
         } catch (e) {
           debugPrint('Error stopping video: $e');
@@ -3166,53 +3199,53 @@ class CreateReelsController extends GetxController {
       }
 
       update();
-      
+
       // Navigate to save reel screen
       await Get.to(() => const SaveReelScreen());
-      
+
       // 🔵 STEP 3: Resume video and music when returning from save screen
       if (isVideo.value) {
         try {
           // CRITICAL: Ensure video is properly initialized before resuming (especially for multi-image videos)
-          final videoFile = processedVideoFile.value ?? 
-                           generatedVideo.value ?? 
-                           selectedMedia.value;
-          
+          final videoFile = processedVideoFile.value ??
+              generatedVideo.value ??
+              selectedMedia.value;
+
           // If video controller is null or not initialized, reinitialize it
-          if (videoFile != null && 
-              (videoController.value == null || 
-               !videoController.value!.value.isInitialized ||
-               !isVideoInitialized.value)) {
+          if (videoFile != null &&
+              (videoController.value == null ||
+                  !videoController.value!.value.isInitialized ||
+                  !isVideoInitialized.value)) {
             debugPrint('Video controller not initialized, reinitializing...');
             await reinitializeVideo(videoFile);
             // Wait for initialization to complete
             await Future.delayed(Duration(milliseconds: 500));
           }
-          
+
           // Now check if video is properly initialized
-          if (videoController.value != null && 
+          if (videoController.value != null &&
               videoController.value!.value.isInitialized) {
             // Re-add auto-play listener
             videoController.value!.addListener(_ensureVideoLooping);
-            
+
             // Reset music selection active flag
             isMusicSelectionActive.value = false;
-            
+
             if (!isMusicAppliedToVideo.value) {
               // If music is NOT applied to video, play video (muted) and background music
               // First, ensure video is muted
               await videoController.value!.setVolume(0.0);
-              
+
               // Play video
               await videoController.value!.play();
               debugPrint('✅ Video resumed after returning from save screen');
-              
+
               // CRITICAL: Resume background music if it was selected (for multi-image videos)
-              if (selectedMusicPath.value.isNotEmpty && 
+              if (selectedMusicPath.value.isNotEmpty &&
                   !isMusicPlaying.value) {
                 // Wait a bit for video to start
                 await Future.delayed(Duration(milliseconds: 400));
-                
+
                 // Play background music without pausing video
                 await playBackgroundMusicWithVideo();
                 debugPrint('✅ Background music resumed after returning from save screen');
@@ -3236,18 +3269,18 @@ class CreateReelsController extends GetxController {
       // ShowToast.error('Failed to navigate');
     }
   }
-  
+
   // Save finalized reel - creates finalized video and saves it
   Future<void> saveFinalizedReel(BuildContext context) async {
     if (selectedMedia.value == null) {
       // ShowToast.error('Please select media first');
       return;
     }
-    
+
     try {
       // Stop music before finalizing
       await stopMusic();
-      
+
       // Create finalized video with all edits
       // ShowToast.show(message: 'Finalizing video...', type: ToastType.info);
       final finalized = await createFinalizedVideo(context);
@@ -3255,20 +3288,20 @@ class CreateReelsController extends GetxController {
         // ShowToast.error('Failed to create finalized video');
         return;
       }
-      
+
       debugPrint('Finalized video created: ${finalized.path}');
-      
+
       // TODO: Save the finalized video to gallery/storage
       // For now, just show success message
       // ShowToast.show(message: 'Reel saved successfully!', type: ToastType.success);
-      
+
       // Clear editing state after successful save
       clearAllEditingTools();
-      
+
       // Navigate back to gallery or close
-      Get.back(); // Close save reel screen
-      Get.back(); // Close create reels screen (if needed)
-      
+      Navigator.pop(context); // Close save reel screen
+      Navigator.pop(context); // Close create reels screen (if needed)
+
       debugPrint('Reel saved successfully');
     } catch (e, stackTrace) {
       debugPrint('Error saving reel: $e');
@@ -3281,32 +3314,33 @@ class CreateReelsController extends GetxController {
   void clearAllEditingTools() {
     // Clear all added text overlays
     addedTexts.clear();
-    
+
     // Clear selected music
     selectedMusic.value = '';
     selectedMusicArtist.value = '';
     selectedMusicPath.value = '';
     selectedMusicIndex.value = -1;
     isMusicAppliedToVideo.value = false;
-    
+
     // Clear selected filters (reset to "No effect")
     selectedFilterIndex.value = 0;
     selectedFilterTab.value = 0;
     selectedFilterName.value = 'No effect';
-    
+
     // Stop music playback if playing
     stopMusic();
-    
+
     debugPrint('All editing tools and text cleared');
   }
-  
+
   // Discard changes
   void discardChanges(BuildContext context) async {
-    Get.dialog(
-      AlertDialog(
+    showDialog(context: context, builder: (context) {
+      return AlertDialog(
         backgroundColor: Colors.grey[900],
         title: Text('Discard Changes?', style: TextStyle(color: Colors.white)),
-        content: Text('Are you sure you want to discard all changes?', style: TextStyle(color: Colors.grey)),
+        content: Text('Are you sure you want to discard all changes?',
+            style: TextStyle(color: Colors.grey)),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
@@ -3316,31 +3350,30 @@ class CreateReelsController extends GetxController {
             onPressed: () async {
               // CRITICAL: Stop music first
               await stopMusic();
-              
+
               // CRITICAL: Use _clearAllSelections() to ensure consistent clearing
               // This clears all gallery selections including pink selection indicators
               _clearAllSelections();
-              
+              MediaPickerController.instance.clearSelection();
               // Reset screen state
               currentScreen.value = 0;
               isMusicSelectionActive.value = false;
               isProcessingVideo.value = false;
               processingProgress.value = 0.0;
-              
+
               // Force UI update to reflect cleared selections
               update();
-              
+
               // Wait a bit to ensure UI updates are processed
               await Future.delayed(Duration(milliseconds: 100));
               await TrimmedMusicDB.clearStoredTrimmedMusic();
               // Close dialog and navigate back
-              Get.back();
-              Get.back();
-              clearGalleryState();
+              Navigator.pop(context);
+              Navigator.pop(context);
 
               // Get.offAllNamed(AppRoutes.dashboard);// Close dialog
               // Get.offAllNamed(AppRoutes.dashboard); // Close create reels screen
-              
+
               // CRITICAL: Delete controller to ensure fresh state on next entry
               // This ensures onInit() will be called when controller is recreated
               try {
@@ -3349,20 +3382,20 @@ class CreateReelsController extends GetxController {
               } catch (e) {
                 debugPrint('Error deleting controller: $e');
               }
-              
+
               debugPrint('✅ All changes discarded and selections cleared');
             },
             child: Text('Discard', style: TextStyle(color: Colors.red)),
           ),
         ],
-      ),
-    );
+      );
+    });
   }
-  
+
   // Reset to gallery view
   void backToGallery() async {
     await stopMusic();
-    
+
     // Clean up processed video file
     if (processedVideoFile.value != null) {
       try {
@@ -3375,7 +3408,7 @@ class CreateReelsController extends GetxController {
       }
       processedVideoFile.value = null;
     }
-    
+
     // Clean up generated video file (from trimming or image conversion)
     if (generatedVideo.value != null) {
       try {
@@ -3388,7 +3421,7 @@ class CreateReelsController extends GetxController {
       }
       generatedVideo.value = null;
     }
-    
+
     currentScreen.value = 0;
     selectedMedia.value = null;
     videoController.value?.dispose();
@@ -3407,7 +3440,7 @@ class CreateReelsController extends GetxController {
     videoEndTime.value = 0.0;
     videoDuration.value = 0.0;
     isMusicAppliedToVideo.value = false; // Reset music applied flag
-    
+
     // CRITICAL: Clear multiple selection state (images/media selections)
     isMultipleSelectionMode.value = false;
     selectedImageIndices.clear();
@@ -3415,19 +3448,19 @@ class CreateReelsController extends GetxController {
     selectedImagePositions.clear();
     selectedVideo.value = null;
     multiSelectionType.value = 'none';
-    
+
     // CRITICAL: Refresh gallery picker to clear visual selections
     galleryPickerRefreshKey.value++;
-    
+
     // Refresh all reactive lists to update UI
     selectedImages.refresh();
     selectedImageIndices.refresh();
     selectedImagePositions.refresh();
     selectedVideo.refresh();
-    
+
     // Force UI update
     update();
-    
+
     debugPrint('✅ Back to gallery - all selections cleared');
   }
 }

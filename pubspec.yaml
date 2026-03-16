@@ -55,7 +55,8 @@ dependencies:
   permission_handler: ^11.3.1
   intl: ^0.20.2
   audioplayers: ^6.1.0
-  ffmpeg_kit_flutter_new: ^4.1.0
+#  ffmpeg_kit_flutter_new: ^4.1.0
+  ffmpeg_kit_flutter_new_min_gpl:
   gallery_media_picker: ^0.2.0
   video_thumbnail: ^0.5.6
 #  reels_viewer: ^2.0.0

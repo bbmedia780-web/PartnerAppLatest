@@ -132,9 +132,9 @@ class AppPromotionController extends GetxController {
     ShowToast.success('Promotion $index pushed successfully!');
   }
 
-  void onDeactivatePromotion(int index) {
-    Get.dialog(
-      AlertDialog(
+  void onDeactivatePromotion(int index,BuildContext context) {
+    showDialog(context: context, builder: (context){
+      return AlertDialog(
         title: const Text('Deactivate Promotion'),
         content: const Text('Are you sure you want to deactivate this promotion?'),
         actions: [
@@ -151,8 +151,9 @@ class AppPromotionController extends GetxController {
             child: const Text('Deactivate', style: TextStyle(color: Colors.red)),
           ),
         ],
-      ),
-    );
+      );
+    });
+
   }
 
   @override

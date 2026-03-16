@@ -39,6 +39,7 @@ class _CreateReelsScreenState extends State<CreateReelsScreen>
     controller = Get.put(CreateReelsController());
 
     controller.clearGalleryState();
+    controller.loadGalleryOnce();
   }
 
   @override

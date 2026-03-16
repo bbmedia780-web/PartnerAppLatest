@@ -10,7 +10,7 @@ class DashboardController extends GetxController {
       Get.find<ReelsController>()
           .updateActivation(index == 2); // 2 = reels tab
     }
-    if(currentIndex.value==3){
+    if(currentIndex.value==2){
       Get.toNamed(AppRoutes.reelsView);
     }
   }
